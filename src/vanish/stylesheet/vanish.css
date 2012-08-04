@@ -1,0 +1,93 @@
+
+/*
+
+base_color = #f8f8f8
+fg_color = #363636
+bg_color = #dadada
+text_color = #282828
+selected_bg_color #487392
+insensitive_bg_color shade(@bg_color, 1.00)
+insensitive_fg_color #a8a8a8
+insensitive_border_color shade (@internal_element_color, 1.37)
+internal_element_color #888a85
+
+button_bg_color1 shade(bg_color, 1.15) [hover 1.18]
+button_bg_color2 shade(bg_color, 1.08) [1.11]
+button_bg_color3 bg_color [1.03]
+
+*/
+
+*:hover {
+	background-color: #f8f8f8;
+	color: #282828;
+}
+
+*:disabled {
+	color: #a8a8a8; /*insensitive_fg_color*/
+	border-color: #888a85; /*insensitive_border_color*/
+}
+
+QPushButton {
+	padding: 2px 4px;
+	border-image: url(":/stylesheets/assets/button-border.svg") 3 stretch;
+	border-width: 3px;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #fcfcfc, stop:0.6 #ebebeb, stop:1 @bg_color);
+}
+
+QPushButton:pressed {
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 @bg_color, stop:0.6 #ebebeb, stop:1 #fcfcfc);
+	background-origin: 1px 1px;
+}
+
+QPushButton:hover {
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #fdfdfd, stop:0.60 #ececec, stop:1 #dfdfdf);
+}
+
+QPushButton:pressed {
+	background-origin: content;
+	background-position: top left;
+}
+
+QPushButton:flat {
+	border: none;
+	background: none;
+}
+
+QPushButton:flat:hover {
+	background: #dfdfdf;
+}
+
+QPushButton:default {
+	border-image: url(":/stylesheets/assets/button-default-border.svg") 4 stretch;
+	border-width: 4px;
+}
+
+QToolTip {
+	padding: 4px 4px;
+	border-width: 1px;
+	/*border: 1px solid shade(@bg_color, 0.80);*/
+	border: 1px solid white;
+	border-radius: 1px;
+	/*color: shade(@tooltip_fg_color, 0.90);*/
+	color: black;
+}
+
+/*
+QRubberBand {
+	background-color: alpha(@selected_bg_color, 0.35);
+	background-color: alpha(@selected_bg_color, 0.35);
+	border: 1px solid @selected_bg_color;
+	border-radius: 2px;
+}
+*/
+
+QProgressBar:horizontal {
+	border: 1px solid gray;
+	border-radius: 3px;
+	background: white;
+	padding: 1px;
+}
+
+QProgressBar::chunk:horizontal {
+	background: qlineargradient(x1: 0, y1: 0.5, x2: 1, y2: 0.5, stop: 0 green, stop: 1 white);
+}
