@@ -1990,8 +1990,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
             CFG_READ_BOOL(menuIcons)
             CFG_READ_BOOL(forceAlternateLvCols)
             CFG_READ_BOOL(invertBotTab)
-            CFG_READ_INT_BOOL(menubarHiding, HIDE_KEYBOARD)
-            CFG_READ_INT_BOOL(statusbarHiding, HIDE_KEYBOARD)
             CFG_READ_BOOL(boldProgress)
             CFG_READ_BOOL(coloredTbarMo)
             CFG_READ_BOOL(borderSelection)
@@ -2071,9 +2069,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 #endif
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-            CFG_READ_STRING_LIST(menubarApps)
-            CFG_READ_STRING_LIST(statusbarApps)
-            CFG_READ_STRING_LIST(useQtFileDialogApps)
             CFG_READ_STRING_LIST(windowDragWhiteList)
             CFG_READ_STRING_LIST(windowDragBlackList)
 #endif
@@ -2462,8 +2457,6 @@ void qtcDefaultSettings(Options *opts)
     opts->menuIcons = true;
     opts->forceAlternateLvCols = false;
     opts->invertBotTab = true;
-    opts->menubarHiding = HIDE_NONE;
-    opts->statusbarHiding = HIDE_NONE;
     opts->boldProgress = true;
     opts->coloredTbarMo = false;
     opts->borderSelection = false;
@@ -2505,9 +2498,6 @@ void qtcDefaultSettings(Options *opts)
     opts->centerTabText = false;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
     opts->dwtSettings = DWT_BUTTONS_AS_PER_TITLEBAR | DWT_ROUND_TOP_ONLY;
-    opts->menubarApps << "amarok" << "arora" << "kaffeine" << "kcalc" << "smplayer" << "VirtualBox";
-    opts->statusbarApps << "kde";
-    opts->useQtFileDialogApps << "googleearth-bin";
     opts->noMenuBgndOpacityApps << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer" << "gtk";
     opts->noBgndOpacityApps << "smplayer" << "kaffeine" << "dragon" << "kscreenlocker" << "inkscape" << "sonata" << "totem" << "vmware" << "vmplayer";
 #endif
@@ -3206,8 +3196,6 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_ENTRY(forceAlternateLvCols)
         CFG_WRITE_ENTRY_NUM(square)
         CFG_WRITE_ENTRY(invertBotTab)
-        CFG_WRITE_ENTRY_NUM(menubarHiding)
-        CFG_WRITE_ENTRY_NUM(statusbarHiding)
         CFG_WRITE_ENTRY(boldProgress)
         CFG_WRITE_ENTRY(coloredTbarMo)
         CFG_WRITE_ENTRY(borderSelection)
@@ -3273,9 +3261,6 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
         CFG_WRITE_STRING_LIST_ENTRY(noMenuBgndOpacityApps)
         CFG_WRITE_STRING_LIST_ENTRY(noBgndImageApps)
         CFG_WRITE_STRING_LIST_ENTRY(noMenuStripeApps)
-        CFG_WRITE_STRING_LIST_ENTRY(menubarApps)
-        CFG_WRITE_STRING_LIST_ENTRY(statusbarApps)
-        CFG_WRITE_STRING_LIST_ENTRY(useQtFileDialogApps)
 #endif
 
         for (int i = APPEARANCE_CUSTOM1; i < (APPEARANCE_CUSTOM1 + NUM_CUSTOM_GRAD); ++i) {

@@ -281,15 +281,8 @@ namespace Vanish
                                                    const QWidget *widget) const;
         void           kdeGlobalSettingsChange(int type, int);
         void           borderSizesChanged();
-        void           toggleMenuBar(unsigned int xid);
-        void           toggleStatusBar(unsigned int xid);
-        void           compositingToggled();
 
     private:
-
-        void           toggleMenuBar(QMainWindow *window);
-        void           toggleStatusBar(QMainWindow *window);
-
 #if !defined QTC_QT_ONLY
         void           setupKde4();
 

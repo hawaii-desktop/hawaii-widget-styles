@@ -20,9 +20,6 @@
 
 #include <QtWidgets>
 #include <QtPrintSupport/QPrintDialog>
-#ifdef Q_WS_X11
-#include <QtDBus/QtDBus>
-#endif
 #include "vanishstyle.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
@@ -35,16 +32,6 @@
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
 // in CT_PushButton and CT_ComboBox
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
-
-#ifdef Q_WS_X11
-#include "macmenu.h"
-#include "shadowhelper.h"
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
-#include <sys/time.h>
-#endif
 
 #ifndef QTC_QT_ONLY
 #include <KDE/KApplication>
@@ -83,20 +70,6 @@
                                 : palette.color(COL)) \
                                  : palette.color(QPalette::Disabled, COL))
 #define MO_ARROW(COL)       MO_ARROW_X(state&State_MouseOver, COL)
-
-#ifndef QTC_QT_ONLY
-typedef QString(*_qt_filedialog_existing_directory_hook)(QWidget *parent, const QString &caption, const QString &dir, QFileDialog::Options options);
-extern _qt_filedialog_existing_directory_hook qt_filedialog_existing_directory_hook;
-
-typedef QString(*_qt_filedialog_open_filename_hook)(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
-extern _qt_filedialog_open_filename_hook qt_filedialog_open_filename_hook;
-
-typedef QStringList(*_qt_filedialog_open_filenames_hook)(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
-extern _qt_filedialog_open_filenames_hook qt_filedialog_open_filenames_hook;
-
-typedef QString(*_qt_filedialog_save_filename_hook)(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options);
-extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
-#endif
 
 namespace Vanish
 {
@@ -538,48 +511,6 @@ namespace Vanish
 
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
-#ifdef Q_WS_X11
-    static bool canAccessId(const QWidget *w)
-    {
-        return w && w->testAttribute(Qt::WA_WState_Created) && w->internalWinId();
-    }
-
-    void setOpacityProp(QWidget *w, unsigned short opacity)
-    {
-        if (w && canAccessId(w)) {
-            static const Atom constAtom = XInternAtom(QX11Info::display(), OPACITY_ATOM, False);
-            XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&opacity, 1);
-        }
-    }
-
-    void setBgndProp(QWidget *w, unsigned short app, bool haveBgndImage)
-    {
-        if (w && canAccessId(w)) {
-            static const Atom constAtom = XInternAtom(QX11Info::display(), BGND_ATOM, False);
-            unsigned long prop = ((IS_FLAT_BGND(app) ? (unsigned short)(haveBgndImage ? APPEARANCE_RAISED : APPEARANCE_FLAT) : app) & 0xFF) |
-                                     (w->palette().background().color().rgb() & 0x00FFFFFF) << 8;
-
-            XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&prop, 1);
-        }
-    }
-
-    void setSbProp(QWidget *w)
-{
-        if (w && canAccessId(w->window())) {
-            static const char *constStatusBarProperty = "qtcStatusBar";
-            QVariant            prop(w->property(constStatusBarProperty));
-
-            if (!prop.isValid() || !prop.toBool()) {
-                static const Atom constAtom = XInternAtom(QX11Info::display(), STATUSBAR_ATOM, False);
-
-                unsigned short s = 1;
-                w->setProperty(constStatusBarProperty, true);
-                XChangeProperty(QX11Info::display(), w->window()->winId(), constAtom, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&s, 1);
-            }
-        }
-    }
-#endif
-
 #if defined QTC_QT_ONLY
     static void setRgb(QColor *col, const QStringList &rgb)
     {
@@ -913,10 +844,6 @@ namespace Vanish
           itsTitlebarHeight(0),
           itsPos(-1, -1),
           itsHoverWidget(0L),
-#ifdef Q_WS_X11
-          itsDBus(0),
-          itsShadowHelper(new ShadowHelper(this)),
-#endif
           itsSViewSBar(0L),
           itsWindowManager(new WindowManager(this)),
           itsBlurHelper(new BlurHelper(this)),
@@ -981,27 +908,6 @@ namespace Vanish
             qtcReadConfig(rcFile, &opts);
 #else
             qtcReadConfig(QString(), &opts);
-#endif
-
-#ifdef Q_WS_X11
-            if (initial) {
-                QDBusConnection::sessionBus().connect(QString(), "/KGlobalSettings", "org.kde.KGlobalSettings",
-                                                      "notifyChange", this, SLOT(kdeGlobalSettingsChange(int, int)));
-                QDBusConnection::sessionBus().connect("org.kde.kwin", "/KWin", "org.kde.KWin",
-                                                      "compositingToggled", this, SLOT(compositingToggled()));
-
-                if (!qApp || QString(qApp->argv()[0]) != "kwin") {
-                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/Vanish", "org.kde.Vanish",
-                                                          "borderSizesChanged", this, SLOT(borderSizesChanged()));
-                    if (opts.menubarHiding & HIDE_KWIN)
-                        QDBusConnection::sessionBus().connect("org.kde.kwin", "/Vanish", "org.kde.Vanish",
-                                                              "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
-
-                    if (opts.statusbarHiding & HIDE_KWIN)
-                        QDBusConnection::sessionBus().connect("org.kde.kwin", "/Vanish", "org.kde.Vanish",
-                                                              "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
-                }
-            }
 #endif
         }
 
@@ -1254,10 +1160,6 @@ namespace Vanish
     Style::~Style()
     {
         freeColors();
-#ifdef Q_WS_X11
-        if (itsDBus)
-            delete itsDBus;
-#endif
     }
 
     void Style::freeColor(QSet<QColor *> &freedColors, QColor **cols)
@@ -1363,13 +1265,6 @@ namespace Vanish
             std::cout << "Vanish: Application name: \"" << l1.constData() << "\"\n";
         }
 
-        if (APP_REKONQ == theThemedApp)
-            opts.statusbarHiding = 0;
-        if (opts.menubarHiding)
-            itsSaveMenuBarStatus = opts.menubarApps.contains("kde") || opts.menubarApps.contains(appName);
-        if (opts.statusbarHiding)
-            itsSaveStatusBarStatus = opts.statusbarApps.contains("kde") || opts.statusbarApps.contains(appName);
-
         if (!IS_FLAT_BGND(opts.bgndAppearance) && opts.noBgndGradientApps.contains(appName))
             opts.bgndAppearance = APPEARANCE_FLAT;
         if (IMG_NONE != opts.bgndImage.type && opts.noBgndImageApps.contains(appName))
@@ -1402,21 +1297,11 @@ namespace Vanish
                 itsOOMenuCols = new QColor [TOTAL_SHADES + 1];
                 shadeColors(tint(popupMenuCols()[ORIGINAL_SHADE], itsHighlightCols[ORIGINAL_SHADE], 0.5), itsOOMenuCols);
             }
-            opts.menubarHiding = opts.statusbarHiding = HIDE_NONE;
             opts.square |= SQUARE_POPUP_MENUS | SQUARE_TOOLTIPS;
             if (!IS_FLAT_BGND(opts.menuBgndAppearance) && 0 == opts.lighterPopupMenuBgnd)
                 opts.lighterPopupMenuBgnd = 1; // shade so that we dont have 3d-ish borders...
             opts.menuBgndAppearance = APPEARANCE_FLAT;
         }
-
-#ifndef QTC_QT_ONLY
-        if (opts.useQtFileDialogApps.contains(appName)) {
-            qt_filedialog_existing_directory_hook = 0L;
-            qt_filedialog_open_filename_hook = 0L;
-            qt_filedialog_open_filenames_hook = 0L;
-            qt_filedialog_save_filename_hook = 0L;
-        }
-#endif
 
         BASE_STYLE::polish(app);
         if (opts.hideShortcutUnderline)
@@ -1630,9 +1515,6 @@ namespace Vanish
         }
 
         itsWindowManager->registerWidget(widget);
-#ifdef Q_WS_X11
-        itsShadowHelper->registerWidget(widget);
-#endif
 
         // Need to register all widgets to blur helper, in order to have proper blur_behind region set have proper regions removed for opaque widgets.
         // Note: that the helper does nothing as long as compositing and ARGB are not enabled
@@ -1660,26 +1542,14 @@ namespace Vanish
                     if (APP_PLASMA == theThemedApp && !widget->inherits("QDialog"))
                         break;
 
-#ifdef Q_WS_X11
-                    Utils::addEventFilter(widget, this);
-#endif
                     int  opacity = Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
 
-#ifdef Q_WS_X11
-                    if (APP_KONSOLE == theThemedApp && 100 != opacity && widget->testAttribute(Qt::WA_TranslucentBackground) &&
-                            widget->inherits("Konsole::MainWindow")) {
-                        // Background translucency does not work for konsole :-(
-                        // So, just set titlebar opacity...
-                        setOpacityProp(widget, (unsigned short)opacity);
+                    if (100 == opacity || !widget->isWindow() || Qt::Desktop == widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
+                            widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
+                            widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits("QTipLabel") ||
+                            widget->inherits("QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
+                            !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
                         break;
-                    } else
-#endif
-                        if (100 == opacity || !widget->isWindow() || Qt::Desktop == widget->windowType() || widget->testAttribute(Qt::WA_X11NetWmWindowTypeDesktop) ||
-                                widget->testAttribute(Qt::WA_TranslucentBackground) || widget->testAttribute(Qt::WA_NoSystemBackground) ||
-                                widget->testAttribute(Qt::WA_PaintOnScreen) || widget->inherits("KScreenSaver") || widget->inherits("QTipLabel") ||
-                                widget->inherits("QSplashScreen") || widget->windowFlags().testFlag(Qt::FramelessWindowHint) ||
-                                !(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId()))
-                            break;
 
                     // whenever you set the translucency flag, Qt will create a new widget under the hood, replacing the old
                     // ...unfortunately some properties are lost, among them the window icon.
@@ -1731,39 +1601,6 @@ namespace Vanish
 
         if (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
             widget->setAttribute(Qt::WA_StyledBackground);
-
-        if (opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget()) {
-            Utils::addEventFilter(widget, this);
-            if (itsSaveMenuBarStatus)
-                Utils::addEventFilter(static_cast<QMainWindow *>(widget)->menuWidget(), this);
-            if (itsSaveMenuBarStatus && qtcMenuBarHidden(appName)) {
-                static_cast<QMainWindow *>(widget)->menuWidget()->setHidden(true);
-#ifdef Q_WS_X11
-                if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN || opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-                    emitMenuSize(static_cast<QMainWindow *>(widget)->menuWidget(), 0);
-#endif
-            }
-        }
-
-        if (opts.statusbarHiding && qobject_cast<QMainWindow *>(widget)) {
-            QList<QStatusBar *> sb = getStatusBars(widget);
-
-            if (sb.count()) {
-                Utils::addEventFilter(widget, this);
-                QList<QStatusBar *>::ConstIterator it(sb.begin()),
-                      end(sb.end());
-                for (; it != end; ++it) {
-                    if (itsSaveStatusBarStatus)
-                        Utils::addEventFilter(*it, this);
-                    if (itsSaveStatusBarStatus && qtcStatusBarHidden(appName))
-                        (*it)->setHidden(true);
-                }
-#ifdef Q_WS_X11
-                setSbProp(widget);
-                emitStatusBarState(sb.first());
-#endif
-            }
-        }
 
         // Enable hover effects in all itemviews
         if (QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
@@ -2064,21 +1901,6 @@ namespace Vanish
             widget->layout()->setMargin(0);
         }
 
-#ifdef Q_WS_X11
-        QWidget *window = widget->window();
-
-        if ((100 != opts.bgndOpacity && Qt::Window == (window->windowFlags() & Qt::WindowType_Mask)) ||
-                (100 != opts.dlgOpacity && Qt::Dialog == (window->windowFlags() & Qt::WindowType_Mask))) {
-            widget->removeEventFilter(this);
-            Utils::addEventFilter(widget, this);
-
-            if (widget->inherits("KFilePlacesView")) {
-                widget->setAutoFillBackground(false);
-                widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
-            }
-        }
-#endif
-
         // Make file selection button in QPrintDialog appear more KUrlRequester like...
         if (qobject_cast<QToolButton *>(widget) &&
                 widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
@@ -2231,9 +2053,6 @@ namespace Vanish
         }
 
         itsWindowManager->unregisterWidget(widget);
-#ifdef Q_WS_X11
-        itsShadowHelper->unregisterWidget(widget);
-#endif
         itsBlurHelper->unregisterWidget(widget);
         unregisterArgbWidget(widget);
 
@@ -2258,26 +2077,6 @@ namespace Vanish
 
         if (itsIsPreview && qobject_cast<QMdiSubWindow *>(widget))
             widget->setAttribute(Qt::WA_StyledBackground, false);
-
-        if (opts.menubarHiding && qobject_cast<QMainWindow *>(widget) && static_cast<QMainWindow *>(widget)->menuWidget()) {
-            widget->removeEventFilter(this);
-            if (itsSaveMenuBarStatus)
-                static_cast<QMainWindow *>(widget)->menuWidget()->removeEventFilter(this);
-        }
-
-        if (opts.statusbarHiding && qobject_cast<QMainWindow *>(widget)) {
-            QList<QStatusBar *> sb = getStatusBars(widget);
-
-            if (sb.count()) {
-                widget->removeEventFilter(this);
-                if (itsSaveStatusBarStatus) {
-                    QList<QStatusBar *>::ConstIterator it(sb.begin()),
-                          end(sb.end());
-                    for (; it != end; ++it)
-                        (*it)->removeEventFilter(this);
-                }
-            }
-        }
 
         if (qobject_cast<QPushButton *>(widget) ||
                 qobject_cast<QComboBox *>(widget) ||
@@ -2418,14 +2217,6 @@ namespace Vanish
                 qobject_cast<QToolBar *>(widget) ||
                 (widget && qobject_cast<QToolBar *>(widget->parent())))
             widget->setBackgroundRole(QPalette::Button);
-#ifdef Q_WS_X11
-        QWidget *window = widget->window();
-
-        if ((100 != opts.bgndOpacity && Qt::Window == (window->windowFlags() & Qt::WindowType_Mask)) ||
-                (100 != opts.dlgOpacity && Qt::Dialog == (window->windowFlags() & Qt::WindowType_Mask))) {
-            widget->removeEventFilter(this);
-        }
-#endif
     }
 
     //
@@ -2562,54 +2353,7 @@ namespace Vanish
                         widget->setMask(windowMask(widget->rect(), opts.round > ROUND_SLIGHT));
                     return false;
                 }
-#ifdef Q_WS_X11
-                else if ((BLEND_TITLEBAR || opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding & HIDE_KWIN) &&
-                         qobject_cast<QMenuBar *>(object)) {
-                    QResizeEvent *re = static_cast<QResizeEvent *>(event);
-
-                    if (re->size().height() != re->oldSize().height())
-                        emitMenuSize((QMenuBar *)object, PREVIEW_MDI == itsIsPreview || !((QMenuBar *)object)->isVisible()
-                                     ? 0 : re->size().height());
-                }
-#endif
                 break;
-            case QEvent::ShortcutOverride:
-                if ((opts.menubarHiding || opts.statusbarHiding) && qobject_cast<QMainWindow *>(object)) {
-                    QMainWindow *window = static_cast<QMainWindow *>(object);
-
-                    if (window->isVisible()) {
-                        if (opts.menubarHiding & HIDE_KEYBOARD && window->menuWidget()) {
-                            QKeyEvent *k = static_cast<QKeyEvent *>(event);
-
-                            if (k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_M == k->key())
-                                toggleMenuBar(window);
-                        }
-                        if (opts.statusbarHiding & HIDE_KEYBOARD) {
-                            QKeyEvent *k = static_cast<QKeyEvent *>(event);
-
-                            if (k->modifiers()&Qt::ControlModifier && k->modifiers()&Qt::AltModifier && Qt::Key_S == k->key())
-                                toggleStatusBar(window);
-                        }
-                    }
-                }
-                break;
-            case QEvent::ShowToParent:
-                if (opts.menubarHiding && itsSaveMenuBarStatus && qobject_cast<QMenuBar *>(object) &&
-                        qtcMenuBarHidden(appName))
-                    static_cast<QMenuBar *>(object)->setHidden(true);
-                if (opts.statusbarHiding && itsSaveStatusBarStatus && qobject_cast<QStatusBar *>(object) &&
-                        qtcStatusBarHidden(appName))
-                    static_cast<QStatusBar *>(object)->setHidden(true);
-                break;
-#ifdef Q_WS_X11
-            case QEvent::PaletteChange: {
-                QWidget *widget = qobject_cast<QWidget *>(object);
-
-                if (widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window | Qt::Dialog)))
-                    setBgndProp(widget, opts.bgndAppearance, IMG_NONE != opts.bgndImage.type);
-                break;
-            }
-#endif
             case QEvent::Paint: {
                 if (CUSTOM_BGND) {
                     QWidget *widget = qobject_cast<QWidget *>(object);
@@ -2768,33 +2512,10 @@ namespace Vanish
                         widget->setMask(windowMask(widget->rect(), opts.round > ROUND_SLIGHT));
                     return false;
                 }
-#ifdef Q_WS_X11
-                else if ((BLEND_TITLEBAR || opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding & HIDE_KWIN) &&
-                         qobject_cast<QMenuBar *>(object)) {
-                    QMenuBar *mb = (QMenuBar *)object;
-                    emitMenuSize((QMenuBar *)mb, PREVIEW_MDI == itsIsPreview || !((QMenuBar *)mb)->isVisible() ? 0 : mb->size().height(), true);
-                } else if (QEvent::Show == event->type()) {
-                    QWidget *widget = qobject_cast<QWidget *>(object);
-
-                    if (widget && widget->isWindow() && ((widget->windowFlags()&Qt::WindowType_Mask) & (Qt::Window | Qt::Dialog))) {
-                        setBgndProp(widget, opts.bgndAppearance, IMG_NONE != opts.bgndImage.type);
-
-                        int opacity = Qt::Dialog == (widget->windowFlags() & Qt::WindowType_Mask) ? opts.dlgOpacity : opts.bgndOpacity;
-                        setOpacityProp(widget, (unsigned short)opacity);
-                    }
-                }
-#endif
                 break;
             }
             case QEvent::Destroy:
             case QEvent::Hide: {
-#ifdef Q_WS_X11
-                if ((BLEND_TITLEBAR || opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR || opts.menubarHiding & HIDE_KWIN) &&
-                        qobject_cast<QMenuBar *>(object)) {
-                    QMenuBar *mb = (QMenuBar *)object;
-                    emitMenuSize((QMenuBar *)mb, 0);
-                }
-#endif
                 if (itsHoverWidget && object == itsHoverWidget) {
                     itsPos.setX(-1);
                     itsPos.setY(-1);
@@ -3153,9 +2874,6 @@ namespace Vanish
                 return BLEND_TITLEBAR;
             case QtC_ShadeMenubarOnlyWhenActive:
                 return opts.shadeMenubarOnlyWhenActive;
-            case QtC_ToggleButtons:
-                return (opts.menubarHiding & HIDE_KWIN   ? 0x1 : 0) +
-                       (opts.statusbarHiding & HIDE_KWIN ? 0x2 : 0);
             case QtC_MenubarColor:
                 return itsMenubarCols[ORIGINAL_SHADE].rgb();
             case QtC_TitleBarApp:
@@ -3544,7 +3262,7 @@ namespace Vanish
                     mode = QIcon::Disabled;
 
                 drawItemPixmap(painter, r, Qt::AlignCenter, QIcon::fromTheme("dialog-close").pixmap(size, mode, state & State_Sunken
-                                                                                         ? QIcon::On : QIcon::Off));
+                               ? QIcon::On : QIcon::Off));
                 break;
             }
 #endif
@@ -3934,7 +3652,7 @@ namespace Vanish
 
                             if (opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100 == opts.bgndOpacity &&
                                     widget && widget->parentWidget() && !inQAbstractItemView/* &&
-                       widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
+                   widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
                                 painter->setPen(widget->parentWidget()->palette().background().color());
                                 painter->drawRect(r);
                                 painter->drawRect(r.adjusted(1, 1, -1, -1));
@@ -4966,10 +4684,6 @@ namespace Vanish
                 QPainterPath path = rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
                 QColor       col = palette.toolTipBase().color();
 
-#ifdef Q_WS_X11
-                if (widget && widget->window())
-                    itsShadowHelper->registerWidget(widget->window());
-#endif
                 painter->save();
                 if (rounded)
                     painter->setRenderHint(QPainter::Antialiasing, true);
@@ -10689,7 +10403,7 @@ namespace Vanish
                     buildSplitPath(inner, round, qtcGetRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
 
                     p->setPen((enabled || BORDER_SUNKEN == borderProfile) /*&&
-                        (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
+                    (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
                               ? tl
                               : option->palette.background().color());
                     p->drawPath(topPath);
@@ -10698,11 +10412,11 @@ namespace Vanish
                                (WIDGET_ENTRY != w && doBlend && BORDER_SUNKEN == borderProfile)))) {
                         if (!hasFocus && !hasMouseOver && BORDER_LIGHT != borderProfile && WIDGET_SCROLLVIEW != w)
                             p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
-                                ? checkColour(option, QPalette::Window)
-                                : WIDGET_ENTRY==w && !hasFocus
-                                    ? checkColour(option, QPalette::Base)
-                                    : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                                                                        WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
+                            ? checkColour(option, QPalette::Window)
+                            : WIDGET_ENTRY==w && !hasFocus
+                                ? checkColour(option, QPalette::Base)
+                                : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                                                                    WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
                                 ? br
                                 : checkColour(option, QPalette::Window));
                         p->drawPath(botPath);
@@ -12272,178 +11986,4 @@ namespace Vanish
         }
 #endif
     }
-
-#ifdef Q_WS_X11
-    static QMainWindow *getWindow(unsigned int xid)
-    {
-        QWidgetList                tlw = QApplication::topLevelWidgets();
-        QWidgetList::ConstIterator it(tlw.begin()),
-                    end(tlw.end());
-
-        for (; it != end; ++it) {
-            if (qobject_cast<QMainWindow *>(*it) && (*it)->winId() == xid)
-                return static_cast<QMainWindow *>(*it);
-        }
-        return 0L;
-    }
-
-    static bool diffTime(struct timeval *lastTime)
-    {
-        struct timeval now, diff;
-
-        gettimeofday(&now, NULL);
-        timersub(&now, lastTime, &diff);
-        *lastTime = now;
-        return diff.tv_sec > 0 || diff.tv_usec > 500000;
-    }
-#endif
-
-    void Style::toggleMenuBar(unsigned int xid)
-    {
-#ifdef Q_WS_X11
-        static unsigned int   lastXid  = 0;
-        static struct timeval lastTime = {0, 0};
-
-        if (diffTime(&lastTime) || lastXid != xid) {
-            QMainWindow *win = getWindow(xid);
-            if (win)
-                toggleMenuBar(win);
-        }
-        lastXid = xid;
-#else
-        Q_UNUSED(xid);
-#endif
-    }
-
-    void Style::toggleStatusBar(unsigned int xid)
-    {
-#ifdef Q_WS_X11
-        static unsigned int   lastXid  = 0;
-        static struct timeval lastTime = {0, 0};
-
-        if (diffTime(&lastTime) || lastXid != xid) {
-            QMainWindow *win = getWindow(xid);
-            if (win)
-                toggleStatusBar(win);
-        }
-        lastXid = xid;
-#else
-        Q_UNUSED(xid);
-#endif
-    }
-
-    void Style::compositingToggled()
-    {
-#ifdef Q_WS_X11
-        QWidgetList                tlw = QApplication::topLevelWidgets();
-        QWidgetList::ConstIterator it(tlw.begin()),
-                    end(tlw.end());
-
-        for (; it != end; ++it)
-            (*it)->update();
-#endif
-    }
-
-    void Style::toggleMenuBar(QMainWindow *window)
-    {
-        bool triggeredAction(false);
-
-#ifndef QTC_QT_ONLY
-        if (qobject_cast<KXmlGuiWindow *>(window)) {
-            KActionCollection *collection = static_cast<KXmlGuiWindow *>(window)->actionCollection();
-            QAction           *act = collection ? collection->action(KStandardAction::name(KStandardAction::ShowMenubar)) : 0L;
-            if (act) {
-                act->trigger();
-                triggeredAction = true;
-            }
-        }
-#endif
-        if (!triggeredAction) {
-            QWidget *menubar = window->menuWidget();
-            if (itsSaveMenuBarStatus)
-                qtcSetMenuBarHidden(appName, menubar->isVisible());
-
-            window->menuWidget()->setHidden(menubar->isVisible());
-        }
-    }
-
-    void Style::toggleStatusBar(QMainWindow *window)
-    {
-        bool triggeredAction(false);
-
-#ifndef QTC_QT_ONLY
-        if (qobject_cast<KXmlGuiWindow *>(window)) {
-            KActionCollection *collection = static_cast<KXmlGuiWindow *>(window)->actionCollection();
-            QAction           *act = collection ? collection->action(KStandardAction::name(KStandardAction::ShowStatusbar)) : 0L;
-            if (act) {
-                act->trigger();
-                triggeredAction = true;
-#ifdef Q_WS_X11
-                //emitStatusBarState(true); // TODO: ???
-#endif
-            }
-        }
-#endif
-        if (!triggeredAction) {
-            QList<QStatusBar *> sb = getStatusBars(window);
-
-            if (sb.count()) {
-                if (itsSaveStatusBarStatus)
-                    qtcSetStatusBarHidden(appName, sb.first()->isVisible());
-
-                QList<QStatusBar *>::ConstIterator it(sb.begin()),
-                      end(sb.end());
-                for (; it != end; ++it)
-                    (*it)->setHidden((*it)->isVisible());
-
-#ifdef Q_WS_X11
-                emitStatusBarState(sb.first());
-#endif
-            }
-        }
-    }
-
-#ifdef Q_WS_X11
-    void Style::emitMenuSize(QWidget *w, unsigned short size, bool force)
-    {
-        if (w && canAccessId(w->window())) {
-            static const char *constMenuSizeProperty = "qtcMenuSize";
-
-            unsigned short oldSize = 2000;
-
-            if (!force) {
-                QVariant prop(w->property(constMenuSizeProperty));
-
-                if (prop.isValid()) {
-                    bool ok;
-                    oldSize = prop.toUInt(&ok);
-                    if (!ok)
-                        oldSize = 2000;
-                }
-            }
-
-            if (oldSize != size) {
-                static const Atom constQtCMenuSize = XInternAtom(QX11Info::display(), MENU_SIZE_ATOM, False);
-
-                w->setProperty(constMenuSizeProperty, size);
-                XChangeProperty(QX11Info::display(), w->window()->winId(),
-                                constQtCMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
-                if (!itsDBus)
-                    itsDBus = new QDBusInterface("org.kde.kwin", "/Vanish", "org.kde.Vanish");
-                itsDBus->call(QDBus::NoBlock, "menuBarSize", (unsigned int)w->window()->winId(), (int)size);
-            }
-        }
-    }
-
-    void Style::emitStatusBarState(QStatusBar *sb)
-    {
-        if (opts.statusbarHiding & HIDE_KWIN) {
-            if (!itsDBus)
-                itsDBus = new QDBusInterface("org.kde.kwin", "/Vanish", "org.kde.Vanish");
-            itsDBus->call(QDBus::NoBlock, "statusBarState", (unsigned int)sb->window()->winId(), sb->isVisible());
-        }
-    }
-
-#endif
-
 }

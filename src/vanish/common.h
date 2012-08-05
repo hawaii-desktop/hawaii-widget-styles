@@ -425,7 +425,6 @@ typedef enum {
     QtC_TitleBarEffect,
     QtC_BlendMenuAndTitleBar,
     QtC_ShadeMenubarOnlyWhenActive,
-    QtC_ToggleButtons,
     QtC_MenubarColor,
     QtC_WindowBorder,
     QtC_CustomBgnd,
@@ -1099,9 +1098,7 @@ typedef struct
     bool             lvLines;
     EGradType        bgndGrad,
                      menuBgndGrad;
-    int              menubarHiding,
-                     statusbarHiding,
-                     square,
+    int              square,
                      windowDrag,
                      windowBorder,
                      bgndOpacity,
@@ -1203,10 +1200,7 @@ typedef struct
 #endif
     Strings          noMenuStripeApps;
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
-    Strings          menubarApps,
-                     statusbarApps,
-                     useQtFileDialogApps,
-                     windowDragWhiteList,
+    Strings          windowDragWhiteList,
                      windowDragBlackList;
 #endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
 
