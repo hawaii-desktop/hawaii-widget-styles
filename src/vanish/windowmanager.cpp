@@ -63,17 +63,6 @@
 #include <KGlobalSettings>
 #endif
 
-#ifdef Q_WS_X11
-#include <QX11Info>
-#ifdef QTC_QT_ONLY
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#else
-#include <NETRootInfo>
-#endif
-#endif
-
 namespace Vanish
 {
 
@@ -105,17 +94,8 @@ namespace Vanish
     WindowManager::WindowManager(QObject *parent):
         QObject(parent),
         _enabled(true),
-#ifdef Q_WS_X11
-        _useWMMoveResize(true),
-#else
-        _useWMMoveResize(false),
-#endif
         _dragMode(WM_DRAG_NONE),
-#ifdef QTC_QT_ONLY
         _dragDistance(QApplication::startDragDistance()),
-#else
-        _dragDistance(KGlobalSettings::dndEventDelay()),
-#endif
         _dragDelay(QApplication::startDragTime()),
         _dragAboutToStart(false),
         _dragInProgress(false),
@@ -135,7 +115,6 @@ namespace Vanish
 
         setEnabled(windowDrag);
         setDragMode(windowDrag);
-        //CPD: Why???        setUseWMMoveResize( OxygenStyleConfigData::useWMMoveResize() );
 
 #ifndef QTC_QT_ONLY
         setDragDistance(KGlobalSettings::dndEventDelay());
@@ -323,18 +302,14 @@ namespace Vanish
             } else if (QPoint(mouseEvent->globalPos() - _globalDragPoint).manhattanLength() >= _dragDistance) {
                 _dragTimer.start(0, this);
             }
-            return true;
-
-        } else if (!useWMMoveResize()) {
-
+        } else {
             // use QWidget::move for the grabbing
             /* this works only if the sending object and the target are identical */
             QWidget *window(_target.data()->window());
             window->move(window->pos() + mouseEvent->pos() - _dragPoint);
-            return true;
+        }
 
-        } else return false;
-
+        return true;
     }
 
     //_____________________________________________________________
@@ -623,12 +598,9 @@ namespace Vanish
     //____________________________________________________________
     void WindowManager::resetDrag(void)
     {
-
-        if ((!useWMMoveResize()) && _target && _cursorOverride) {
-
+        if (_target && _cursorOverride) {
             qApp->restoreOverrideCursor();
             _cursorOverride = false;
-
         }
 
         _target.clear();
@@ -647,60 +619,14 @@ namespace Vanish
         if (!(enabled() && widget)) return;
         if (QWidget::mouseGrabber()) return;
 
-        // ungrab pointer
-        if (useWMMoveResize()) {
-
-#ifdef Q_WS_X11
-#ifdef QTC_QT_ONLY
-            static const Atom constNetMoveResize = XInternAtom(QX11Info::display(), "_NET_WM_MOVERESIZE", False);
-            //...Taken from bespin...
-            // stolen... errr "adapted!" from QSizeGrip
-            QX11Info info;
-            XEvent xev;
-            xev.xclient.type = ClientMessage;
-            xev.xclient.message_type = constNetMoveResize;
-            xev.xclient.display = QX11Info::display();
-            xev.xclient.window = widget->window()->winId();
-            xev.xclient.format = 32;
-            xev.xclient.data.l[0] = position.x();
-            xev.xclient.data.l[1] = position.y();
-            xev.xclient.data.l[2] = 8; // NET::Move
-            xev.xclient.data.l[3] = Button1;
-            xev.xclient.data.l[4] = 0;
-            XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-            XSendEvent(QX11Info::display(), QX11Info::appRootWindow(info.screen()), False,
-                       SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-#else
-            XUngrabPointer(QX11Info::display(), QX11Info::appTime());
-            NETRootInfo rootInfo(QX11Info::display(), NET::WMMoveResize);
-            rootInfo.moveResizeRequest(widget->window()->winId(), position.x(), position.y(), NET::Move);
-#endif // QTC_QT_ONLY
-#endif
-
-        }
-
-        if (!useWMMoveResize()) {
-            if (!_cursorOverride) {
-                qApp->setOverrideCursor(Qt::SizeAllCursor);
-                _cursorOverride = true;
-            }
+        if (!_cursorOverride) {
+            qApp->setOverrideCursor(Qt::SizeAllCursor);
+            _cursorOverride = true;
         }
 
         _dragInProgress = true;
 
         return;
-
-    }
-
-    //____________________________________________________________
-    bool WindowManager::supportWMMoveResize(void) const
-    {
-
-#ifdef Q_WS_X11
-        return true;
-#endif
-
-        return false;
 
     }
 
@@ -736,15 +662,6 @@ namespace Vanish
         }
 
         if (!_parent->enabled()) return false;
-
-        /*
-        if a drag is in progress, the widget will not receive any event
-        we trigger on the first MouseMove or MousePress events that are received
-        by any widget in the application to detect that the drag is finished
-        */
-        if (_parent->useWMMoveResize() && _parent->_dragInProgress && _parent->_target && (event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress)) {
-            return appMouseEvent(object, event);
-        }
 
         return false;
 

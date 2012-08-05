@@ -119,16 +119,6 @@ namespace Vanish
             _enabled = value;
         }
 
-        //! returns true if window manager is used for moving
-        bool useWMMoveResize(void) const {
-            return supportWMMoveResize() && _useWMMoveResize;
-        }
-
-        //! use window manager for moving, when available
-        void setUseWMMoveResize(bool value) {
-            _useWMMoveResize = value;
-        }
-
         //! drag mode
         int dragMode(void) const {
             return _dragMode;
@@ -187,10 +177,6 @@ namespace Vanish
         //! start drag
         void startDrag(QWidget *, const QPoint &);
 
-        //! returns true if window manager is used for moving
-        /*! right now this is true only for X11 */
-        bool supportWMMoveResize(void) const;
-
         //! utility function
         bool isDockWidgetTitle(const QWidget *) const;
 
@@ -212,9 +198,6 @@ namespace Vanish
 
         //! enability
         bool _enabled;
-
-        //! use WM moveResize
-        bool _useWMMoveResize;
 
         //! drag mode
         int _dragMode;

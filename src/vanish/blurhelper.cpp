@@ -37,29 +37,13 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolBar>
 
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include "fixx11h.h"
-#include <QX11Info>
-#endif
-
 namespace Vanish
 {
-
     //___________________________________________________________
     BlurHelper::BlurHelper(QObject *parent):
         QObject(parent),
         _enabled(false)
     {
-
-#ifdef Q_WS_X11
-
-        // create atom
-        _atom = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
-
-#endif
-
     }
 
     //___________________________________________________________
@@ -175,52 +159,11 @@ namespace Vanish
     //___________________________________________________________
     void BlurHelper::update(QWidget *widget) const
     {
-
-#ifdef Q_WS_X11
-
-        /*
-        directly from bespin code. Supposibly prevent playing with some 'pseudo-widgets'
-        that have winId matching some other -random- window
-        */
-        if (!(widget->testAttribute(Qt::WA_WState_Created) || widget->internalWinId())) {
-            return;
-        }
-
-        const QRegion region(blurRegion(widget));
-        if (region.isEmpty()) {
-
-            clear(widget);
-
-        } else {
-
-            QVector<unsigned long> data;
-            foreach(const QRect & rect, region.rects()) {
-                data << rect.x() << rect.y() << rect.width() << rect.height();
-            }
-
-            XChangeProperty(
-                QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace,
-                reinterpret_cast<const unsigned char *>(data.constData()), data.size());
-
-        }
-
-        // force update
-        if (widget->isVisible()) {
-            widget->update();
-        }
-
-#endif
-
     }
 
 
     //___________________________________________________________
     void BlurHelper::clear(QWidget *widget) const
     {
-#ifdef Q_WS_X11
-        XChangeProperty(QX11Info::display(), widget->winId(), _atom, XA_CARDINAL, 32, PropModeReplace, 0, 0);
-#endif
-
     }
-
 }

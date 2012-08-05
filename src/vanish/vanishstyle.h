@@ -63,9 +63,6 @@ namespace Vanish
     class WindowManager;
     class BlurHelper;
     class ShortcutHandler;
-#ifdef Q_WS_X11
-    class ShadowHelper;
-#endif
 
     class Style : public QCommonStyle
     {
@@ -290,11 +287,6 @@ namespace Vanish
         void           setDecorationColors();
         void           applyKdeSettings(bool pal);
 #endif
-#ifdef Q_WS_X11
-        bool           isWindowDragWidget(QObject *o);
-        void           emitMenuSize(QWidget *w, unsigned short size, bool force = false);
-        void           emitStatusBarState(QStatusBar *sb);
-#endif
 
     private:
 
@@ -346,10 +338,6 @@ namespace Vanish
         // Required for Q3Header hover...
         QPoint                             itsPos;
         QWidget                            *itsHoverWidget;
-#ifdef Q_WS_X11
-        QDBusInterface                     *itsDBus;
-        Vanish::ShadowHelper              *itsShadowHelper;
-#endif
         mutable QScrollBar                 *itsSViewSBar;
         mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
 #if !defined QTC_QT_ONLY

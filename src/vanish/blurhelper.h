@@ -41,10 +41,6 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QRegion>
 #include <QtWidgets/QToolBar>
-//
-#ifdef Q_WS_X11
-#include <X11/Xdefs.h>
-#endif
 
 namespace Vanish
 {
@@ -152,12 +148,6 @@ namespace Vanish
 
         //! delayed update timer
         QBasicTimer _timer;
-
-#ifdef Q_WS_X11
-        //! blur atom
-        Atom _atom;
-#endif
-
     };
 
     bool BlurHelper::isTransparent(const QWidget *widget) const

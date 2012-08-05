@@ -1468,7 +1468,7 @@ namespace Vanish
     {
         widget->setAttribute(Qt::WA_TranslucentBackground);
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
         //FramelessWindowHint is needed on windows to make WA_TranslucentBackground work properly
         widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
 #endif
@@ -3652,7 +3652,7 @@ namespace Vanish
 
                             if (opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100 == opts.bgndOpacity &&
                                     widget && widget->parentWidget() && !inQAbstractItemView/* &&
-                   widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
+           widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
                                 painter->setPen(widget->parentWidget()->palette().background().color());
                                 painter->drawRect(r);
                                 painter->drawRect(r.adjusted(1, 1, -1, -1));
@@ -10403,7 +10403,7 @@ namespace Vanish
                     buildSplitPath(inner, round, qtcGetRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
 
                     p->setPen((enabled || BORDER_SUNKEN == borderProfile) /*&&
-                    (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
+            (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
                               ? tl
                               : option->palette.background().color());
                     p->drawPath(topPath);
@@ -10412,11 +10412,11 @@ namespace Vanish
                                (WIDGET_ENTRY != w && doBlend && BORDER_SUNKEN == borderProfile)))) {
                         if (!hasFocus && !hasMouseOver && BORDER_LIGHT != borderProfile && WIDGET_SCROLLVIEW != w)
                             p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
-                            ? checkColour(option, QPalette::Window)
-                            : WIDGET_ENTRY==w && !hasFocus
-                                ? checkColour(option, QPalette::Base)
-                                : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                                                                    WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
+                    ? checkColour(option, QPalette::Window)
+                    : WIDGET_ENTRY==w && !hasFocus
+                        ? checkColour(option, QPalette::Base)
+                        : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                                                            WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
                                 ? br
                                 : checkColour(option, QPalette::Window));
                         p->drawPath(botPath);

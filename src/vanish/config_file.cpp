@@ -623,7 +623,7 @@ static bool makeDir(const QString &dir, int mode)
     if (QDir::isRelativePath(dir))
         return false;
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     return QDir().mkpath(dir);
 #else
     QString target = dir;
