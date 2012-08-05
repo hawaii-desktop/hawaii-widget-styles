@@ -1621,7 +1621,7 @@ namespace Vanish
         */
 
         // 'Fix' konqueror's large menubar...
-        if (!opts.xbar && APP_KONQUEROR == theThemedApp && widget->parentWidget() && qobject_cast<QToolButton *>(widget) && qobject_cast<QMenuBar *>(widget->parentWidget()))
+        if (APP_KONQUEROR == theThemedApp && widget->parentWidget() && qobject_cast<QToolButton *>(widget) && qobject_cast<QMenuBar *>(widget->parentWidget()))
             widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
 
         if (EFFECT_NONE != opts.buttonEffect && !USE_CUSTOM_ALPHAS(opts) && isNoEtchWidget(widget)) {
@@ -1836,14 +1836,6 @@ namespace Vanish
                 setBold(widget);
             Utils::addEventFilter(widget, this);
         } else if (qobject_cast<QMenuBar *>(widget)) {
-#ifdef Q_WS_X11
-            if (opts.xbar &&
-                    (!((APP_QTDESIGNER == theThemedApp || APP_KDEVELOP == theThemedApp) && widget->inherits("QDesignerMenuBar"))))
-                Bespin::MacMenu::manage((QMenuBar *)widget);
-
-            if (BLEND_TITLEBAR || opts.menubarHiding & HIDE_KWIN || opts.windowBorder & WINDOW_BORDER_USE_MENUBAR_COLOR_FOR_TITLEBAR)
-                emitMenuSize(widget, PREVIEW_MDI == itsIsPreview || !widget->isVisible() ? 0 : widget->rect().height());
-#endif
             if (CUSTOM_BGND)
                 widget->setBackgroundRole(QPalette::NoRole);
 
@@ -2318,11 +2310,6 @@ namespace Vanish
                 unSetBold(widget);
             itsProgressBars.remove((QProgressBar *)widget);
         } else if (qobject_cast<QMenuBar *>(widget)) {
-#ifdef Q_WS_X11
-            if (opts.xbar)
-                Bespin::MacMenu::release((QMenuBar *)widget);
-#endif
-
             widget->setAttribute(Qt::WA_Hover, false);
 
             if (CUSTOM_BGND)
@@ -3297,15 +3284,6 @@ namespace Vanish
             case SH_TitleBar_AutoRaise:
                 return 1;
             case SH_MainWindow_SpaceBelowMenuBar:
-#ifdef Q_WS_X11
-                if (opts.xbar)
-                    if (const QMenuBar *menubar = qobject_cast<const QMenuBar *>(widget))
-                        if (0 == menubar->height() && !menubar->actions().isEmpty()) {
-                            // we trick menubars if we use macmenus - hehehe...
-                            // NOTICE the final result NEEDS to be > "0" (i.e. "1") to avoid side effects...
-                            return -menubar->actionGeometry(menubar->actions().first()).height() + 1;
-                        }
-#endif
                 return 0;
             case SH_DialogButtonLayout:
                 return opts.gtkButtonOrder ? QDialogButtonBox::GnomeLayout : QDialogButtonBox::KdeLayout;
@@ -3989,7 +3967,7 @@ namespace Vanish
             case PE_PanelMenuBar:
                 if (widget && widget->parentWidget() && (qobject_cast<const QMainWindow *>(widget->parentWidget()))) {
                     painter->save();
-                    if (!opts.xbar || (!widget || 0 != strcmp("QWidget", widget->metaObject()->className())))
+                    if (!widget || 0 != strcmp("QWidget", widget->metaObject()->className()))
                         drawMenuOrToolBarBackground(widget, painter, r, option);
                     if (TB_NONE != opts.toolbarBorders) {
                         const QColor *use = itsActive
@@ -5716,7 +5694,7 @@ namespace Vanish
 
                     painter->save();
 
-                    if (!opts.xbar || (!widget || 0 != strcmp("QWidget", widget->metaObject()->className())))
+                    if (!widget || 0 != strcmp("QWidget", widget->metaObject()->className()))
                         drawMenuOrToolBarBackground(widget, painter, mbi->menuRect, option);
 
                     if (active)
@@ -6154,7 +6132,7 @@ namespace Vanish
             case CE_MenuBarEmptyArea: {
                 painter->save();
 
-                if (!opts.xbar || (!widget || 0 != strcmp("QWidget", widget->metaObject()->className())))
+                if (!widget || 0 != strcmp("QWidget", widget->metaObject()->className()))
                     drawMenuOrToolBarBackground(widget, painter, r, option);
                 if (TB_NONE != opts.toolbarBorders && widget && widget->parentWidget() &&
                         (qobject_cast<const QMainWindow *>(widget->parentWidget()))) {
@@ -8789,7 +8767,7 @@ namespace Vanish
             case CT_MenuBar:
                 if (APP_KONQUEROR == theThemedApp && widget && qobject_cast<const QMenuBar *>(widget)) {
                     int height = konqMenuBarSize((const QMenuBar *)widget);
-                    if (!opts.xbar || (size.height() > height))
+                    if (size.height() > height)
                         newSize.setHeight(height);
                 }
                 break;

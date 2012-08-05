@@ -1085,7 +1085,6 @@ typedef struct
                      menuIcons,
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
                      stdBtnSizes,
-                     xbar,
 #endif // defined QT_VERSION && (QT_VERSION >= 0x040000)
                      forceAlternateLvCols,
                      invertBotTab,
