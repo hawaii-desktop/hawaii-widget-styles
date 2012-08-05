@@ -348,12 +348,12 @@ namespace Vanish
         }
     }
 
-    static const QToolBar *getToolBar(const QWidget *w/*, bool checkQ3*/)
+    static const QToolBar *getToolBar(const QWidget *w)
     {
         return w
-               ? qobject_cast<const QToolBar *>(w) // || (checkQ3 && w->inherits("Q3ToolBar"))
+               ? qobject_cast<const QToolBar *>(w)
                ? static_cast<const QToolBar *>(w)
-               : getToolBar(w->parentWidget()/*, checkQ3*/)
+               : getToolBar(w->parentWidget())
                : 0L;
     }
 
@@ -672,38 +672,6 @@ namespace Vanish
         }
     };
 
-    class StylePlugin : public QStylePlugin
-    {
-    public:
-
-        StylePlugin(QObject *parent = 0) : QStylePlugin(parent) {}
-        ~StylePlugin() {}
-
-        QStringList keys() const {
-            QSet<QString> styles;
-            styles.insert("Vanish");
-
-#ifdef QTC_STYLE_SUPPORT
-            getStyles(kdeHome(), styles);
-            getStyles(KDE_PREFIX(useQt3Settings() ? 3 : 4), styles);
-            getStyles(KDE_PREFIX(useQt3Settings() ? 4 : 3), styles);
-#endif
-            return styles.toList();
-        }
-
-        QStyle *create(const QString &key) {
-            return "qtcurve" == key.toLower()
-                   ? new Style
-#ifdef QTC_STYLE_SUPPORT
-                   : 0 == key.indexOf(THEME_PREFIX)
-                   ? new Style(key)
-#endif
-                   : 0;
-        }
-    };
-
-    Q_EXPORT_PLUGIN2(Style, StylePlugin)
-
     inline int numButtons(EScrollbar type)
     {
         switch (type) {
@@ -792,7 +760,7 @@ namespace Vanish
         const QWidget *wid = widget ? widget->parentWidget() : 0L;
 
         while (wid) {
-            if (qobject_cast<const QToolBar *>(wid) || wid->inherits("Q3ToolBar"))
+            if (qobject_cast<const QToolBar *>(wid))
                 return true;
             wid = wid->parentWidget();
         }
@@ -1352,7 +1320,7 @@ namespace Vanish
 
     void Style::polish(QApplication *app)
     {
-        appName = getFile(app->argv()[0]);
+        appName = getFile(app->arguments()[0]);
 
         if ("kwin" == appName)
             theThemedApp = APP_KWIN;
@@ -1841,8 +1809,7 @@ namespace Vanish
                  //        qobject_cast<QDockWidget *>(widget) ||
                  widget->inherits("QWorkspaceTitleBar") ||
                  widget->inherits("QDockSeparator") ||
-                 widget->inherits("QDockWidgetSeparator") ||
-                 widget->inherits("Q3DockWindowResizeHandle")))
+                 widget->inherits("QDockWidgetSeparator")))
             widget->setAttribute(Qt::WA_Hover, true);
 
         if (qobject_cast<QSplitterHandle *>(widget))
@@ -1867,12 +1834,6 @@ namespace Vanish
             if (opts.boldProgress)
                 setBold(widget);
             Utils::addEventFilter(widget, this);
-        } else if (widget->inherits("Q3Header")) {
-            widget->setMouseTracking(true);
-            Utils::addEventFilter(widget, this);
-        } else if (opts.highlightScrollViews && widget->inherits("Q3ScrollView")) {
-            Utils::addEventFilter(widget, this);
-            widget->setAttribute(Qt::WA_Hover, true);
         } else if (qobject_cast<QMenuBar *>(widget)) {
 #ifdef Q_WS_X11
             if (opts.xbar &&
@@ -2047,7 +2008,7 @@ namespace Vanish
             QWidget *wid = widget ? widget->parentWidget() : 0L;
 
             while (wid && !parentIsToolbar) {
-                parentIsToolbar = qobject_cast<QToolBar *>(wid) || wid->inherits("Q3ToolBar");
+                parentIsToolbar = qobject_cast<QToolBar *>(wid);
                 wid = wid->parentWidget();
             }
         }
@@ -2075,7 +2036,7 @@ namespace Vanish
         if (parentIsToolbar && (qobject_cast<QComboBox *>(widget) || qobject_cast<QLineEdit *>(widget)))
             widget->setFont(QApplication::font());
 
-        if (qobject_cast<QMenuBar *>(widget) || widget->inherits("Q3ToolBar") || qobject_cast<QToolBar *>(widget) || parentIsToolbar)
+        if (qobject_cast<QMenuBar *>(widget) || qobject_cast<QToolBar *>(widget) || parentIsToolbar)
             widget->setBackgroundRole(QPalette::Window);
 
         if (!IS_FLAT(opts.toolbarAppearance) && parentIsToolbar)
@@ -2344,8 +2305,7 @@ namespace Vanish
                 //       qobject_cast<QDockWidget *>(widget) ||
                 widget->inherits("QWorkspaceTitleBar") ||
                 widget->inherits("QDockSeparator") ||
-                widget->inherits("QDockWidgetSeparator") ||
-                widget->inherits("Q3DockWindowResizeHandle"))
+                widget->inherits("QDockWidgetSeparator"))
             widget->setAttribute(Qt::WA_Hover, false);
         if (qobject_cast<QScrollBar *>(widget)) {
             widget->setAttribute(Qt::WA_Hover, false);
@@ -2358,12 +2318,7 @@ namespace Vanish
             if (opts.boldProgress)
                 unSetBold(widget);
             itsProgressBars.remove((QProgressBar *)widget);
-        } else if (widget->inherits("Q3Header")) {
-            widget->setMouseTracking(false);
-            widget->removeEventFilter(this);
-        } else if (opts.highlightScrollViews && widget->inherits("Q3ScrollView"))
-            widget->removeEventFilter(this);
-        else if (qobject_cast<QMenuBar *>(widget)) {
+        } else if (qobject_cast<QMenuBar *>(widget)) {
 #ifdef Q_WS_X11
             if (opts.xbar)
                 Bespin::MacMenu::release((QMenuBar *)widget);
@@ -2474,7 +2429,6 @@ namespace Vanish
         }
 
         if (qobject_cast<QMenuBar *>(widget) ||
-                widget->inherits("Q3ToolBar") ||
                 qobject_cast<QToolBar *>(widget) ||
                 (widget && qobject_cast<QToolBar *>(widget->parent())))
             widget->setBackgroundRole(QPalette::Button);
@@ -2494,6 +2448,7 @@ namespace Vanish
     // adjsut its position...
     static bool updateMenuBarEvent(QMouseEvent *event, QMenuBar *menu)
     {
+#ifdef PORT_DONE
         struct HackEvent : public QMouseEvent {
             bool adjust() {
                 if (p.x() < 2 || p.y() < 2) {
@@ -2515,6 +2470,7 @@ namespace Vanish
             ((HackedMenu *)menu)->send(event);
             return true;
         }
+#endif
         return false;
     }
 
@@ -2583,6 +2539,7 @@ namespace Vanish
                                     (sbars[i] == itsSViewSBar &&
                                      (QEvent::MouseMove == event->type() ||
                                       QEvent::MouseButtonRelease == event->type()))) {
+#ifdef PORT_DONE
                                 if (QEvent::Wheel != event->type()) {
                                     struct HackEvent : public QMouseEvent {
                                         void set(const QPoint &mapped, bool vert) {
@@ -2593,6 +2550,7 @@ namespace Vanish
 
                                     ((HackEvent *)event)->set(mapped, 0 == i);
                                 }
+#endif
                                 sbars[i]->event(event);
                                 if (QEvent::MouseButtonPress == event->type())
                                     itsSViewSBar = sbars[i];
@@ -2882,7 +2840,7 @@ namespace Vanish
                 break;
             }
             case QEvent::Enter:
-                if (object->isWidgetType() && object->inherits("Q3Header")) {
+                if (object->isWidgetType()) {
                     itsHoverWidget = (QWidget *)object;
 
                     if (itsHoverWidget && !itsHoverWidget->isEnabled())
@@ -2900,7 +2858,7 @@ namespace Vanish
             case QEvent::MouseMove: { // Only occurs for widgets with mouse tracking enabled
                 QMouseEvent *me = dynamic_cast<QMouseEvent *>(event);
 
-                if (me && itsHoverWidget && object->isWidgetType() && object->inherits("Q3Header")) {
+                if (me && itsHoverWidget && object->isWidgetType()) {
                     if (!me->pos().isNull() && me->pos() != itsPos)
                         itsHoverWidget->repaint();
                     itsPos = me->pos();
@@ -2909,7 +2867,7 @@ namespace Vanish
             }
             case QEvent::FocusIn:
             case QEvent::FocusOut:
-                if (opts.highlightScrollViews && object->isWidgetType() && object->inherits("Q3ScrollView")) {
+                if (opts.highlightScrollViews && object->isWidgetType()) {
                     ((QWidget *)object)->update();
                     return false;
                 }
@@ -3096,7 +3054,7 @@ namespace Vanish
                     return (opts.square & SQUARE_SCROLLVIEW) ? 1 : 0;
 
                 if ((opts.square & SQUARE_SCROLLVIEW) && widget && !opts.etchEntry &&
-                        (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget) || widget->inherits("Q3ScrollView")))
+                        (::qobject_cast<const QAbstractScrollArea *>(widget) || isKontactPreviewPane(widget)))
                     return (opts.gtkScrollViews || opts.thinSbarGroove || !opts.borderSbarGroove) && (!opts.highlightScrollViews) ? 1 : 2;
 
                 if (!DRAW_MENU_BORDER && !opts.borderMenuitems && opts.square & SQUARE_POPUP_MENUS && qobject_cast<const QMenu *>(widget))
@@ -3104,8 +3062,7 @@ namespace Vanish
 
                 if (DO_EFFECT && opts.etchEntry &&
                         (!widget || // !isFormWidget(widget) &&
-                         ::qobject_cast<const QLineEdit *>(widget) || ::qobject_cast<const QAbstractScrollArea *>(widget) ||
-                         widget->inherits("Q3ScrollView") /*|| isKontactPreviewPane(widget)*/))
+                         ::qobject_cast<const QLineEdit *>(widget) || ::qobject_cast<const QAbstractScrollArea *>(widget)))
                     return 3;
                 else
                     return 2;
@@ -3115,9 +3072,11 @@ namespace Vanish
             case PM_IndicatorHeight:
             case PM_ExclusiveIndicatorWidth:
             case PM_ExclusiveIndicatorHeight:
+#ifdef PORT_DONE
             case PM_CheckListControllerSize:
             case PM_CheckListButtonSize:
                 return DO_EFFECT ? opts.crSize + 2 : opts.crSize;
+#endif
             case PM_TabBarTabOverlap:
                 return TAB_MO_GLOW == opts.tabMouseOver ? 0 : 1;
             case PM_ProgressBarChunkWidth:
@@ -3373,8 +3332,6 @@ namespace Vanish
                        : opts.gtkScrollViews && (!widget || !widget->inherits("QComboBoxListView"));
             case SH_ComboBox_Popup:
                 if (opts.gtkComboMenus) {
-                    if (widget && widget->inherits("Q3ComboBox"))
-                        return 0;
                     if (const QStyleOptionComboBox *cmb = qstyleoption_cast<const QStyleOptionComboBox *>(option))
                         return !cmb->editable;
                 }
@@ -4002,7 +3959,6 @@ namespace Vanish
                              kontactPreview(!kateView && isKontactPreviewPane(widget)),
                              sv(isOOWidget(widget) ||
                                 ::qobject_cast<const QAbstractScrollArea *>(widget) ||
-                                (widget && widget->inherits("Q3ScrollView")) ||
                                 ((opts.square & SQUARE_SCROLLVIEW) && (kateView || kontactPreview))),
                              squareSv(sv && ((opts.square & SQUARE_SCROLLVIEW) || (widget && widget->isWindow()))),
                              inQAbstractItemView(widget && widget->parentWidget() && isInQAbstractItemView(widget->parentWidget()));
@@ -4082,8 +4038,7 @@ namespace Vanish
                 break;
             }
             case PE_PanelMenuBar:
-                if (widget && widget->parentWidget() && (qobject_cast<const QMainWindow *>(widget->parentWidget()) ||
-                                                         widget->parentWidget()->inherits("Q3MainWindow"))) {
+                if (widget && widget->parentWidget() && (qobject_cast<const QMainWindow *>(widget->parentWidget()))) {
                     painter->save();
                     if (!opts.xbar || (!widget || 0 != strcmp("QWidget", widget->metaObject()->className())))
                         drawMenuOrToolBarBackground(widget, painter, r, option);
@@ -4308,24 +4263,6 @@ namespace Vanish
                     }
                 }
                 break;
-            case PE_Q3CheckListIndicator:
-                if (const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option)) {
-                    if (lv->items.isEmpty())
-                        break;
-
-                    QStyleOptionQ3ListViewItem item(lv->items.at(0));
-                    int                        x(lv->rect.x()),
-                                               w(lv->rect.width()),
-                                               marg(lv->itemMargin);
-
-                    if (state & State_Selected && !lv->rootIsDecorated && !(item.features & QStyleOptionQ3ListViewItem::ParentControl))
-                        painter->fillRect(0, 0, x + marg + w + 4, item.height, palette.brush(QPalette::Highlight));
-                }
-
-                r.setX(r.x() + ((r.width() - opts.crSize) / 2) - 1);
-                r.setY(r.y() + ((r.height() - opts.crSize) / 2) - 1);
-                r.setWidth(opts.crSize);
-                r.setHeight(opts.crSize);
             case PE_IndicatorMenuCheckMark:
             case PE_IndicatorCheckBox: {
                 bool  menu(state & STATE_MENU),
@@ -4438,24 +4375,6 @@ namespace Vanish
                 painter->restore();
                 break;
             }
-            case PE_Q3CheckListExclusiveIndicator:
-                if (const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option)) {
-                    if (lv->items.isEmpty())
-                        break;
-
-                    QStyleOptionQ3ListViewItem item(lv->items.at(0));
-                    int                        x(lv->rect.x()),
-                                               w(lv->rect.width()),
-                                               marg(lv->itemMargin);
-
-                    if (state & State_Selected && !lv->rootIsDecorated && !(item.features & QStyleOptionQ3ListViewItem::ParentControl))
-                        painter->fillRect(0, 0, x + marg + w + 4, item.height, palette.brush(QPalette::Highlight));
-                }
-
-                r.setX(r.x() + ((r.width() - opts.crSize) / 2) - 1);
-                r.setY(r.y() + ((r.height() - opts.crSize) / 2) - 1);
-                r.setWidth(opts.crSize);
-                r.setHeight(opts.crSize);
             case PE_IndicatorRadioButton: {
                 bool isOO(isOOWidget(widget)),
                      selectedOOMenu(isOO && (r == QRect(0, 0, 15, 15) || r == QRect(0, 0, 14, 15)) && // OO.o 3.2 =14x15?
@@ -4620,11 +4539,9 @@ namespace Vanish
                     } else {
                         //Figuring out in what beast we are painting...
                         bool view(state & State_Item ||
-                                  ((widget && ((qobject_cast<const QAbstractScrollArea *>(widget)) ||
-                                               widget->inherits("Q3ScrollView"))) ||
+                                  ((widget && ((qobject_cast<const QAbstractScrollArea *>(widget)))) ||
                                    (widget && widget->parent() &&
-                                    ((qobject_cast<const QAbstractScrollArea *>(widget->parent())) ||
-                                     widget->parent()->inherits("Q3ScrollView")))));
+                                    ((qobject_cast<const QAbstractScrollArea *>(widget->parent()))))));
 
                         if (!view && !widget) {
                             // Try to determine if we are in a KPageView...
@@ -5564,13 +5481,10 @@ namespace Vanish
                     painter->save();
 
                     if (state & (State_Raised | State_Sunken)) {
-                        bool         sunken(state & (/*State_Down |*/ /*State_On | */State_Sunken)),
-                                     q3Header(widget && widget->inherits("Q3Header"));
+                        bool         sunken(state & (/*State_Down |*/ /*State_On | */State_Sunken));
                         QStyleOption opt(*option);
 
                         opt.state &= ~State_On;
-                        if (q3Header && widget && widget->underMouse() && itsHoverWidget && r.contains(itsPos))
-                            opt.state |= State_MouseOver;
 
                         if (-1 == ho->section && !(state & State_Enabled) && widget && widget->isEnabled())
                             opt.state |= State_Enabled;
@@ -5592,8 +5506,7 @@ namespace Vanish
                             if (opts.coloredMouseOver && state & State_MouseOver && state & State_Enabled)
                                 drawHighlight(painter, QRect(r.x(), r.y() + r.height() - 2, r.width(), 2), true, true);
 
-                            if (q3Header ||
-                                    (QStyleOptionHeader::End != ho->position && QStyleOptionHeader::OnlyOneSection != ho->position)) {
+                            if ((QStyleOptionHeader::End != ho->position && QStyleOptionHeader::OnlyOneSection != ho->position)) {
                                 drawFadedLine(painter, QRect(r.x() + r.width() - 2, r.y() + 5, 1, r.height() - 10), use[STD_BORDER], true, true, false);
                                 drawFadedLine(painter, QRect(r.x() + r.width() - 1, r.y() + 5, 1, r.height() - 10), use[0], true, true, false);
                             }
@@ -5604,8 +5517,7 @@ namespace Vanish
                             else
                                 drawAaLine(painter, r.x() + r.width() - 1, r.y(), r.x() + r.width() - 1, r.y() + r.height() - 1);
 
-                            if (q3Header ||
-                                    (QStyleOptionHeader::End != ho->position && QStyleOptionHeader::OnlyOneSection != ho->position)) {
+                            if ((QStyleOptionHeader::End != ho->position && QStyleOptionHeader::OnlyOneSection != ho->position)) {
                                 drawFadedLine(painter, QRect(r.x() + 5, r.y() + r.height() - 2, r.width() - 10, 1), use[STD_BORDER], true, true, true);
                                 drawFadedLine(painter, QRect(r.x() + 5, r.y() + r.height() - 1, r.width() - 10, 1), use[0], true, true, true);
                             }
@@ -6296,7 +6208,7 @@ namespace Vanish
                 if (!opts.xbar || (!widget || 0 != strcmp("QWidget", widget->metaObject()->className())))
                     drawMenuOrToolBarBackground(widget, painter, r, option);
                 if (TB_NONE != opts.toolbarBorders && widget && widget->parentWidget() &&
-                        (qobject_cast<const QMainWindow *>(widget->parentWidget()) || widget->parentWidget()->inherits("Q3MainWindow"))) {
+                        (qobject_cast<const QMainWindow *>(widget->parentWidget()))) {
                     const QColor *use = menuColors(option, itsActive);
                     bool         dark(TB_DARK == opts.toolbarBorders || TB_DARK_ALL == opts.toolbarBorders);
 
@@ -7692,144 +7604,6 @@ namespace Vanish
                         box.rect = checkBoxRect;
                         /*proxy()->*/
                         drawPrimitive(PE_IndicatorCheckBox, &box, painter, widget);
-                    }
-                }
-                break;
-            case CC_Q3ListView:
-                if (const QStyleOptionQ3ListView *lv = qstyleoption_cast<const QStyleOptionQ3ListView *>(option)) {
-                    int i;
-                    if (lv->subControls & SC_Q3ListView)
-                        QCommonStyle::drawComplexControl(control, lv, painter, widget);
-                    if (lv->subControls & (SC_Q3ListViewBranch | SC_Q3ListViewExpand)) {
-                        if (lv->items.isEmpty())
-                            break;
-
-                        QStyleOptionQ3ListViewItem item(lv->items.at(0));
-                        int                        y(r.y()),
-                                                   c;
-                        QPolygon                   lines;
-
-                        painter->save();
-                        painter->setRenderHint(QPainter::Antialiasing, false);
-                        if ((lv->activeSubControls & SC_All) && (lv->subControls & SC_Q3ListViewExpand)) {
-                            c = 2;
-                            if (opts.lvLines) {
-                                lines.resize(2);
-                                lines[0] = QPoint(r.right(), r.top());
-                                lines[1] = QPoint(r.right(), r.bottom());
-                            }
-                        } else {
-                            int linetop(0),
-                                linebot(0);
-                            // each branch needs at most two lines, ie. four end points
-                            lines.resize(item.childCount * 4);
-                            c = 0;
-
-                            // skip the stuff above the exposed rectangle
-                            for (i = 1; i < lv->items.size(); ++i) {
-                                QStyleOptionQ3ListViewItem child = lv->items.at(i);
-                                if (child.height + y > 0)
-                                    break;
-                                y += child.totalHeight;
-                            }
-                            int bx(r.width() / 2);
-
-                            // paint stuff in the magical area
-                            while (i < lv->items.size() && y < r.height()) {
-                                QStyleOptionQ3ListViewItem child = lv->items.at(i);
-                                if (child.features & QStyleOptionQ3ListViewItem::Visible) {
-                                    int lh(!(item.features & QStyleOptionQ3ListViewItem::MultiLine)
-                                           ? child.height
-                                           : painter->fontMetrics().height() + 2 * lv->itemMargin);
-
-                                    lh = qMax(lh, QApplication::globalStrut().height());
-                                    if (lh % 2 > 0)
-                                        ++lh;
-                                    linebot = y + lh / 2;
-                                    if (child.features & QStyleOptionQ3ListViewItem::Expandable
-                                            || (child.childCount > 0 && child.height > 0)) {
-
-                                        QRect ar(bx - 4, linebot - 4, 11, 11);
-
-#if 0
-                                        if (LV_OLD == opts.lvLines) {
-                                            int lo(ROUNDED ? 2 : 0);
-
-                                            painter->setPen(palette.mid().color());
-                                            painter->drawLine(ar.x() + lo, ar.y(), (ar.x() + ar.width() - 1) - lo, ar.y());
-                                            painter->drawLine(ar.x() + lo, ar.y() + ar.height() - 1, (ar.x() + ar.width() - 1) - lo, ar.y() + ar.height() - 1);
-                                            painter->drawLine(ar.x(), ar.y() + lo, ar.x(), (ar.y() + ar.height() - 1) - lo);
-                                            painter->drawLine(ar.x() + ar.width() - 1, ar.y() + lo, ar.x() + ar.width() - 1, (ar.y() + ar.height() - 1) - lo);
-
-                                            if (ROUNDED) {
-                                                painter->drawPoint(ar.x() + 1, ar.y() + 1);
-                                                painter->drawPoint(ar.x() + 1, ar.y() + ar.height() - 2);
-                                                painter->drawPoint(ar.x() + ar.width() - 2, ar.y() + 1);
-                                                painter->drawPoint(ar.x() + ar.width() - 2, ar.y() + ar.height() - 2);
-
-                                                QColor col(palette.mid().color());
-
-                                                col.setAlphaF(0.5);
-                                                painter->setPen(col);
-                                                painter->drawLine(ar.x() + 1, ar.y() + 1, ar.x() + 2, ar.y());
-                                                painter->drawLine(ar.x() + ar.width() - 2, ar.y(), ar.x() + ar.width() - 1, ar.y() + 1);
-                                                painter->drawLine(ar.x() + 1, ar.y() + ar.height() - 2, ar.x() + 2, ar.y() + ar.height() - 1);
-                                                painter->drawLine(ar.x() + ar.width() - 2, ar.y() + ar.height() - 1, ar.x() + ar.width() - 1, ar.y() + ar.height() - 2);
-                                            }
-                                        }
-#endif
-
-                                        drawArrow(painter, ar,
-                                                  child.state & State_Open
-                                                  ? PE_IndicatorArrowDown
-                                                  : reverse
-                                                  ? PE_IndicatorArrowLeft
-                                                  : PE_IndicatorArrowRight,
-                                                  palette.text().color());
-
-                                        if (opts.lvLines) {
-                                            lines[c++] = QPoint(bx + 1, linetop);
-                                            lines[c++] = QPoint(bx + 1, linebot - 4);
-                                            lines[c++] = QPoint(bx + 6, linebot);
-                                            lines[c++] = QPoint(r.width(), linebot);
-                                            linetop = linebot + 6;
-                                        }
-                                    } else if (opts.lvLines) {
-                                        // just dotlinery
-                                        lines[c++] = QPoint(bx + 1, linebot - 1);
-                                        lines[c++] = QPoint(r.width(), linebot - 1);
-                                    }
-                                    y += child.totalHeight;
-                                }
-                                ++i;
-                            }
-
-                            if (opts.lvLines) {
-                                // Expand line height to edge of rectangle if there's any
-                                // visible child below
-                                while (i < lv->items.size() && lv->items.at(i).height <= 0)
-                                    ++i;
-
-                                if (i < lv->items.size())
-                                    linebot = r.height();
-
-                                if (linetop < linebot) {
-                                    lines[c++] = QPoint(bx + 1, linetop);
-                                    lines[c++] = QPoint(bx + 1, linebot - 1);
-                                }
-                            }
-                        }
-
-                        if (opts.lvLines && (lv->subControls & SC_Q3ListViewBranch)) {
-                            painter->setPen(palette.mid().color());
-
-                            for (int line = 0; line < c; line += 2)
-                                if (lines[line].y() == lines[line + 1].y())
-                                    painter->drawLine(lines[line].x(), lines[line].y(), lines[line + 1].x(), lines[line].y());
-                                else
-                                    painter->drawLine(lines[line].x(), lines[line].y(), lines[line].x(), lines[line + 1].y());
-                        }
-                        painter->restore();
                     }
                 }
                 break;
