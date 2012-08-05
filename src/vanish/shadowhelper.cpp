@@ -28,10 +28,10 @@
 #include "shadow.h"
 #include "utils.h"
 
-#include <QtGui/QDockWidget>
-#include <QtGui/QMenu>
+#include <QtWidgets/QDockWidget>
+#include <QtWidgets/QMenu>
 #include <QtGui/QPainter>
-#include <QtGui/QToolBar>
+#include <QtWidgets/QToolBar>
 #include <QtCore/QEvent>
 
 #ifdef Q_WS_X11

@@ -40,7 +40,7 @@
 #include <QtCore/QString>
 #include <QtCore/QWeakPointer>
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 namespace QtCurve
 {

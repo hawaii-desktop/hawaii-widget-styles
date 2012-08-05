@@ -18,7 +18,7 @@
   Boston, MA 02110-1301, USA.
 */
 
-#include <QtGui>
+#include <QtWidgets>
 #ifdef Q_WS_X11
 #include <QtDBus/QtDBus>
 #endif

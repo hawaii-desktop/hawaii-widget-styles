@@ -34,7 +34,6 @@
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
 #include <QFormLayout>
 #endif
-#include <Q_UINT64>
 typedef qulonglong QtcKey;
 #include "common.h"
 

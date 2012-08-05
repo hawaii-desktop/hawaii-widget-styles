@@ -19,7 +19,7 @@
 */
 
 #include "shortcuthandler.h"
-#include <QtGui>
+#include <QtWidgets>
 
 namespace QtCurve
 {
