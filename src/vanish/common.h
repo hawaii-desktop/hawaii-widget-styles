@@ -1054,7 +1054,6 @@ typedef struct
                      stdSidebarButtons,
                      toolbarTabs,
                      gtkComboMenus,
-                     mapKdeIcons,
                      gtkButtonOrder,
                      fadeLines,
                      reorderGtkButtons,

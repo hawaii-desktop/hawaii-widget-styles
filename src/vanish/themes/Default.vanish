@@ -82,7 +82,6 @@ lighterPopupMenuBgnd=0
 lvAppearance=gradient
 lvButton=false
 lvLines=true
-mapKdeIcons=true
 menuBgndAppearance=soft
 menuBgndGrad=horiz
 menuBgndImage=file

@@ -2030,7 +2030,6 @@ bool qtcReadConfig(const char *file, Options *opts, Options *defOpts)
 #endif
 #if !defined __cplusplus || defined CONFIG_DIALOG
             CFG_READ_INT(expanderHighlight)
-            CFG_READ_BOOL(mapKdeIcons)
 #endif
 #if defined CONFIG_DIALOG || (defined QT_VERSION && (QT_VERSION >= 0x040000)) || !defined __cplusplus
             CFG_READ_BOOL(gtkButtonOrder)
@@ -2522,7 +2521,6 @@ void qtcDefaultSettings(Options *opts)
 #endif
 
 #if !defined __cplusplus || defined CONFIG_DIALOG
-    opts->mapKdeIcons = true;
     opts->expanderHighlight = DEFAULT_EXPANDER_HIGHLIGHT_FACTOR;
 #endif
     opts->titlebarAppearance = APPEARANCE_CUSTOM1;
@@ -3251,7 +3249,6 @@ bool qtcWriteConfig(KConfig *cfg, const Options &opts, const Options &def, bool 
 #if !defined __cplusplus || (defined CONFIG_DIALOG && defined QT_VERSION && (QT_VERSION >= 0x040000))
         CFG_WRITE_ENTRY(reorderGtkButtons)
 #endif
-        CFG_WRITE_ENTRY(mapKdeIcons)
         CFG_WRITE_ENTRY(shading)
         CFG_WRITE_ENTRY(titlebarAlignment)
         CFG_WRITE_ENTRY(centerTabText)
