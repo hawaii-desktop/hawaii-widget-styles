@@ -19,31 +19,84 @@
  * along with Vanish Style.  If not, see <http://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <QtWidgets/QStylePlugin>
+#include <QDir>
+#include <QStylePlugin>
+#include <QDebug>
+
+#include <VStandardDirectories>
 
 #include "vanishstyle.h"
 
-class VanishStylePlugin : public QStylePlugin
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QStyleFactoryInterface" FILE "vanish.json")
-public:
-    VanishStylePlugin() {}
+using namespace VStandardDirectories;
 
-    virtual QStyle *create(const QString &key);
-    virtual QStringList keys() const;
-};
-
-QStyle *VanishStylePlugin::create(const QString &key)
+namespace Vanish
 {
-    if (key.toLower() == "vanish")
-        return new Vanish::Style();
-    return 0;
-}
+    class StylePlugin : public QStylePlugin
+    {
+        Q_OBJECT
+        Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QStyleFactoryInterface" FILE "vanish.json")
+    public:
+        StylePlugin();
 
-QStringList VanishStylePlugin::keys() const
-{
-    return QStringList() << "Vanish";
+        virtual QStyle *create(const QString &key);
+        virtual QStringList keys() const;
+
+    private:
+        QMap<QString, QString> m_themes;
+
+        void getThemes(const QString &dir);
+    };
+
+    StylePlugin::StylePlugin()
+    {
+        getThemes(QString("%1/vanish").arg(findDirectory(UserThemesDirectory)));
+        getThemes(QString("%1/vanish").arg(findDirectory(CommonThemesDirectory)));
+        getThemes(QString("%1/vanish").arg(findDirectory(SystemThemesDirectory)));
+    }
+
+    QStyle *StylePlugin::create(const QString &k)
+    {
+        QString key = k.toLower();
+
+        if (key == "vanish")
+            return new Style();
+        else if (m_themes.contains(key))
+            return new Style(m_themes[key]);
+        return 0;
+    }
+
+    QStringList StylePlugin::keys() const
+    {
+        QStringList styles;
+        styles << "Vanish";
+
+        return styles + m_themes.keys();
+    }
+
+    void StylePlugin::getThemes(const QString &dir)
+    {
+        QDir d(dir);
+
+        if (d.exists()) {
+            QStringList filters;
+
+            filters << QString("*."THEME_SUFFIX);
+            d.setNameFilters(filters);
+
+            QStringList entries(d.entryList());
+            QStringList::ConstIterator it(entries.begin()),
+                        end(entries.end());
+
+            for (; it != end; ++it) {
+                QString fileName((*it));
+                QString style = fileName.left(fileName.lastIndexOf("."THEME_SUFFIX)).toLower();
+
+                qDebug() << fileName;
+                if (!m_themes.contains(style))
+                    m_themes[style] = fileName;
+            }
+        }
+    }
 }
 
 #include "main.moc"

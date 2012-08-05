@@ -57,7 +57,6 @@ namespace Vanish
     class Style : public QCommonStyle
     {
         Q_OBJECT
-        Q_CLASSINFO("X-KDE-CustomElements", "true")
     public:
         enum BackgroundType {
             BGND_WINDOW,

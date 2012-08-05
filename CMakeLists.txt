@@ -43,5 +43,11 @@ if(NOT Qt5PrintSupport_FOUND)
     message(FATAL_ERROR "Qt5PrintSupport module is required!")
 endif()
 
+# Find Vibe libraries
+find_package(VibeCore REQUIRED)
+if(NOT VibeCore_FOUND)
+    message(FATAL_ERROR "VibeCore module is required!")
+endif()
+
 # Subdirectories
 add_subdirectory(src)

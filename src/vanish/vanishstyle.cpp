@@ -503,53 +503,6 @@ namespace Vanish
     }
 #endif
 
-#ifdef QTC_STYLE_SUPPORT
-    static void getStyles(const QString &dir, const char *sub, QSet<QString> &styles)
-    {
-        QDir d(dir + sub);
-
-        if (d.exists()) {
-            QStringList filters;
-
-            filters << QString(THEME_PREFIX"*"THEME_SUFFIX);
-            d.setNameFilters(filters);
-
-            QStringList                entries(d.entryList());
-            QStringList::ConstIterator it(entries.begin()),
-                        end(entries.end());
-
-            for (; it != end; ++it) {
-                QString style((*it).left((*it).lastIndexOf(THEME_SUFFIX)));
-
-                if (!styles.contains(style))
-                    styles.insert(style);
-            }
-        }
-    }
-
-    static void getStyles(const QString &dir, QSet<QString> &styles)
-    {
-        getStyles(dir, THEME_DIR, styles);
-        getStyles(dir, THEME_DIR4, styles);
-    }
-
-    static QString themeFile(const QString &dir, const QString &n, const char *sub)
-    {
-        QString name(dir + sub + n + THEME_SUFFIX);
-
-        return QFile(name).exists() ? name : QString();
-    }
-
-    static QString themeFile(const QString &dir, const QString &n, bool kde3 = false)
-    {
-        QString name(themeFile(dir, n, kde3 ? THEME_DIR : THEME_DIR4));
-
-        if (name.isEmpty())
-            name = themeFile(dir, n, kde3 ? THEME_DIR4 : THEME_DIR);
-        return name;
-    }
-#endif
-
     class VanishDockWidgetTitleBar : public QWidget
     {
     public:
@@ -800,22 +753,8 @@ namespace Vanish
             if (PREVIEW_WINDOW != itsIsPreview)
                 opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
         } else {
-#ifdef QTC_STYLE_SUPPORT
-            QString rcFile;
-            if (!itsName.isEmpty()) {
-                rcFile = themeFile(kdeHome(), itsName);
-
-                if (rcFile.isEmpty()) {
-                    rcFile = themeFile(KDE_PREFIX(4), itsName, false);
-                    if (rcFile.isEmpty())
-                        rcFile = themeFile(KDE_PREFIX(4), itsName, true);
-                }
-            }
-            qtcReadConfig(rcFile, &opts);
-#else
-            qtcReadConfig(QString(), &opts);
-#endif
-        }
+            qtcReadConfig(itsName.isEmpty() ? ":/themes/Default.vanish" : itsName, &opts);
+	}
 
         opts.contrast = QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
         if (opts.contrast < 0 || opts.contrast > 10)
@@ -3456,7 +3395,7 @@ namespace Vanish
 
                             if (opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100 == opts.bgndOpacity &&
                                     widget && widget->parentWidget() && !inQAbstractItemView/* &&
-       widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
+   widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
                                 painter->setPen(widget->parentWidget()->palette().background().color());
                                 painter->drawRect(r);
                                 painter->drawRect(r.adjusted(1, 1, -1, -1));
@@ -10184,7 +10123,7 @@ namespace Vanish
                     buildSplitPath(inner, round, qtcGetRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
 
                     p->setPen((enabled || BORDER_SUNKEN == borderProfile) /*&&
-        (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
+(BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
                               ? tl
                               : option->palette.background().color());
                     p->drawPath(topPath);
@@ -10193,11 +10132,11 @@ namespace Vanish
                                (WIDGET_ENTRY != w && doBlend && BORDER_SUNKEN == borderProfile)))) {
                         if (!hasFocus && !hasMouseOver && BORDER_LIGHT != borderProfile && WIDGET_SCROLLVIEW != w)
                             p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
-                ? checkColour(option, QPalette::Window)
-                : WIDGET_ENTRY==w && !hasFocus
-                    ? checkColour(option, QPalette::Base)
-                    : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                                                        WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
+? checkColour(option, QPalette::Window)
+: WIDGET_ENTRY==w && !hasFocus
+    ? checkColour(option, QPalette::Base)
+    : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                                        WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
                                 ? br
                                 : checkColour(option, QPalette::Window));
                         p->drawPath(botPath);

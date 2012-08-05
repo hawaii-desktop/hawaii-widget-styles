@@ -88,12 +88,8 @@ typedef gchar **Strings;
 #define SETTINGS_GROUP        "Settings"
 #define KWIN_GROUP            "KWin"
 
-/* qtc_<theme name>.themerc support */
-#define KDE_PREFIX(V) ((4==(V)) ? KDE4PREFIX : KDE3PREFIX)
-#define THEME_DIR    "/share/apps/kstyle/themes/"
-#define THEME_DIR4   "/share/kde4/apps/kstyle/themes/"
-#define THEME_PREFIX "qtc_"
-#define THEME_SUFFIX ".themerc"
+/* <theme name>.vanish support */
+#define THEME_SUFFIX ".vanish"
 #define BORDER_SIZE_FILE "windowBorderSizes"
 
 #define LV_SIZE      7
