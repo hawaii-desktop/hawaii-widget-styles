@@ -19,6 +19,7 @@
 */
 
 #include <QtWidgets>
+#include <QtPrintSupport/QPrintDialog>
 #ifdef Q_WS_X11
 #include <QtDBus/QtDBus>
 #endif
@@ -2086,17 +2087,15 @@ namespace Vanish
         }
 #endif
 
-#if !defined QTC_QT_ONLY
         // Make file selection button in QPrintDialog appear more KUrlRequester like...
         if (qobject_cast<QToolButton *>(widget) &&
                 widget->parentWidget() && widget->parentWidget()->parentWidget() && widget->parentWidget()->parentWidget()->parentWidget() &&
                 qobject_cast<QGroupBox *>(widget->parentWidget()) &&
                 qobject_cast<QPrintDialog *>(widget->parentWidget()->parentWidget()->parentWidget()) &&
                 static_cast<QToolButton *>(widget)->text() == QLatin1String("...")) {
-            static_cast<QToolButton *>(widget)->setIcon(KIcon("document-open"));
+            static_cast<QToolButton *>(widget)->setIcon(QIcon::fromTheme("document-open"));
             static_cast<QToolButton *>(widget)->setAutoRaise(false);
         }
-#endif
     }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
@@ -3420,166 +3419,116 @@ namespace Vanish
                 drawIcon(&painter, Qt::color1, QRect(0, 0, pm.width(), pm.height()), false, pix2Icon(pix), true);
                 return QIcon(pm);
             }
-#if defined QTC_QT_ONLY
-            case SP_MessageBoxQuestion:
-            case SP_MessageBoxInformation: {
-                static QIcon icn(load(dialog_information_png_len, dialog_information_png_data));
-                return icn;
-            }
-            case SP_MessageBoxWarning: {
-                static QIcon icn(load(dialog_warning_png_len, dialog_warning_png_data));
-                return icn;
-            }
-            case SP_MessageBoxCritical: {
-                static QIcon icn(load(dialog_error_png_len, dialog_error_png_data));
-                return icn;
-            }
-            /*
-                    case SP_DialogYesButton:
-                    case SP_DialogOkButton:
-                    {
-                        static QIcon icn(load(dialog_ok_png_len, dialog_ok_png_data));
-                        return icn;
-                    }
-                    case SP_DialogNoButton:
-                    case SP_DialogCancelButton:
-                    {
-                        static QIcon icn(load(dialog_cancel_png_len, dialog_cancel_png_data));
-                        return icn;
-                    }
-                    case SP_DialogHelpButton:
-                    {
-                        static QIcon icn(load(help_contents_png_len, help_contents_png_data));
-                        return icn;
-                    }
-                    case SP_DialogCloseButton:
-                    {
-                        static QIcon icn(load(dialog_close_png_len, dialog_close_png_data));
-                        return icn;
-                    }
-                    case SP_DialogApplyButton:
-                    {
-                        static QIcon icn(load(dialog_ok_apply_png_len, dialog_ok_apply_png_data));
-                        return icn;
-                    }
-                    case SP_DialogResetButton:
-                    {
-                        static QIcon icn(load(document_revert_png_len, document_revert_png_data));
-                        return icn;
-                    }
-            */
-#else
             case SP_MessageBoxInformation:
-                return KIcon("dialog-information");
+                return QIcon::fromTheme("dialog-information");
             case SP_MessageBoxWarning:
-                return KIcon("dialog-warning");
+                return QIcon::fromTheme("dialog-warning");
             case SP_MessageBoxCritical:
-                return KIcon("dialog-error");
+                return QIcon::fromTheme("dialog-error");
             case SP_MessageBoxQuestion:
-                return KIcon("dialog-information");
+                return QIcon::fromTheme("dialog-information");
             case SP_DesktopIcon:
-                return KIcon("user-desktop");
+                return QIcon::fromTheme("user-desktop");
             case SP_TrashIcon:
-                return KIcon("user-trash");
+                return QIcon::fromTheme("user-trash");
             case SP_ComputerIcon:
-                return KIcon("computer");
+                return QIcon::fromTheme("computer");
             case SP_DriveFDIcon:
-                return KIcon("media-floppy");
+                return QIcon::fromTheme("media-floppy");
             case SP_DriveHDIcon:
-                return KIcon("drive-harddisk");
+                return QIcon::fromTheme("drive-harddisk");
             case SP_DriveCDIcon:
             case SP_DriveDVDIcon:
-                return KIcon("media-optical");
+                return QIcon::fromTheme("media-optical");
             case SP_DriveNetIcon:
-                return KIcon("network-server");
+                return QIcon::fromTheme("network-server");
             case SP_DirOpenIcon:
-                return KIcon("document-open");
+                return QIcon::fromTheme("document-open");
             case SP_DirIcon:
             case SP_DirClosedIcon:
-                return KIcon("folder");
+                return QIcon::fromTheme("folder");
                 //         case SP_DirLinkIcon:
             case SP_FileIcon:
-                return KIcon("application-x-zerosize");
+                return QIcon::fromTheme("application-x-zerosize");
                 //         case SP_FileLinkIcon:
             case SP_FileDialogStart:
-                return KIcon(Qt::RightToLeft == QApplication::layoutDirection() ? "go-edn" : "go-first");
+                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-edn" : "go-first");
             case SP_FileDialogEnd:
-                return KIcon(Qt::RightToLeft == QApplication::layoutDirection() ? "go-first" : "go-end");
+                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-first" : "go-end");
             case SP_FileDialogToParent:
-                return KIcon("go-up");
+                return QIcon::fromTheme("go-up");
             case SP_FileDialogNewFolder:
-                return KIcon("folder-new");
+                return QIcon::fromTheme("folder-new");
             case SP_FileDialogDetailedView:
-                return KIcon("view-list-details");
+                return QIcon::fromTheme("view-list-details");
                 //         case SP_FileDialogInfoView:
-                //             return KIcon("dialog-ok");
+                //             return QIcon::fromTheme("dialog-ok");
                 //         case SP_FileDialogContentsView:
-                //             return KIcon("dialog-ok");
+                //             return QIcon::fromTheme("dialog-ok");
             case SP_FileDialogListView:
-                return KIcon("view-list-icons");
+                return QIcon::fromTheme("view-list-icons");
             case SP_FileDialogBack:
-                return KIcon(Qt::RightToLeft == QApplication::layoutDirection() ? "go-next" : "go-previous");
+                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-next" : "go-previous");
             case SP_DialogOkButton:
-                return KIcon("dialog-ok");
+                return QIcon::fromTheme("dialog-ok");
             case SP_DialogCancelButton:
-                return KIcon("dialog-cancel");
+                return QIcon::fromTheme("dialog-cancel");
             case SP_DialogHelpButton:
-                return KIcon("help-contents");
+                return QIcon::fromTheme("help-contents");
             case SP_DialogOpenButton:
-                return KIcon("document-open");
+                return QIcon::fromTheme("document-open");
             case SP_DialogSaveButton:
-                return KIcon("document-save");
+                return QIcon::fromTheme("document-save");
             case SP_DialogCloseButton:
-                return KIcon("dialog-close");
+                return QIcon::fromTheme("dialog-close");
             case SP_DialogApplyButton:
-                return KIcon("dialog-ok-apply");
+                return QIcon::fromTheme("dialog-ok-apply");
             case SP_DialogResetButton:
-                return KIcon("document-revert");
+                return QIcon::fromTheme("document-revert");
                 //         case SP_DialogDiscardButton:
-                //              return KIcon("dialog-cancel");
+                //              return QIcon::fromTheme("dialog-cancel");
             case SP_DialogYesButton:
-                return KIcon("dialog-ok");
+                return QIcon::fromTheme("dialog-ok");
             case SP_DialogNoButton:
-                return KIcon("dialog-cancel");
+                return QIcon::fromTheme("dialog-cancel");
             case SP_ArrowUp:
-                return KIcon("arrow-up");
+                return QIcon::fromTheme("arrow-up");
             case SP_ArrowDown:
-                return KIcon("arrow-down");
+                return QIcon::fromTheme("arrow-down");
             case SP_ArrowLeft:
-                return KIcon("arrow-left");
+                return QIcon::fromTheme("arrow-left");
             case SP_ArrowRight:
-                return KIcon("arrow-right");
+                return QIcon::fromTheme("arrow-right");
             case SP_ArrowBack:
-                return KIcon(Qt::RightToLeft == QApplication::layoutDirection() ? "go-next" : "go-previous");
+                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-next" : "go-previous");
             case SP_ArrowForward:
-                return KIcon(Qt::RightToLeft == QApplication::layoutDirection() ? "go-previous" : "go-next");
+                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-previous" : "go-next");
             case SP_DirHomeIcon:
-                return KIcon("user-home");
+                return QIcon::fromTheme("user-home");
                 //         case SP_CommandLink:
                 //         case SP_VistaShield:
             case SP_BrowserReload:
-                return KIcon("view-refresh");
+                return QIcon::fromTheme("view-refresh");
             case SP_BrowserStop:
-                return KIcon("process-stop");
+                return QIcon::fromTheme("process-stop");
             case SP_MediaPlay:
-                return KIcon("media-playback-start");
+                return QIcon::fromTheme("media-playback-start");
             case SP_MediaStop:
-                return KIcon("media-playback-stop");
+                return QIcon::fromTheme("media-playback-stop");
             case SP_MediaPause:
-                return KIcon("media-playback-pause");
+                return QIcon::fromTheme("media-playback-pause");
             case SP_MediaSkipForward:
-                return KIcon("media-skip-forward");
+                return QIcon::fromTheme("media-skip-forward");
             case SP_MediaSkipBackward:
-                return KIcon("media-skip-backward");
+                return QIcon::fromTheme("media-skip-backward");
             case SP_MediaSeekForward:
-                return KIcon("media-seek-forward");
+                return QIcon::fromTheme("media-seek-forward");
             case SP_MediaSeekBackward:
-                return KIcon("media-seek-backward");
+                return QIcon::fromTheme("media-seek-backward");
             case SP_MediaVolume:
-                return KIcon("player-volume");
+                return QIcon::fromTheme("player-volume");
             case SP_MediaVolumeMuted:
-                return KIcon("player-volume-muted");
-#endif
+                return QIcon::fromTheme("player-volume-muted");
             default:
                 break;
         }
@@ -3616,7 +3565,7 @@ namespace Vanish
                 if (!(state & State_Raised) && !(state & State_Sunken) && !(state & QStyle::State_Selected))
                     mode = QIcon::Disabled;
 
-                drawItemPixmap(painter, r, Qt::AlignCenter, KIcon("dialog-close").pixmap(size, mode, state & State_Sunken
+                drawItemPixmap(painter, r, Qt::AlignCenter, QIcon::fromTheme("dialog-close").pixmap(size, mode, state & State_Sunken
                                                                                          ? QIcon::On : QIcon::Off));
                 break;
             }
