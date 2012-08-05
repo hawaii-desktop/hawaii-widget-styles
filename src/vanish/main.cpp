@@ -37,7 +37,7 @@ public:
 QStyle *VanishStylePlugin::create(const QString &key)
 {
     if (key.toLower() == "vanish")
-        return new VanishStyle();
+        return new Vanish::Style();
     return 0;
 }
 

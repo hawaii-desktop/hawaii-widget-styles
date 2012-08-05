@@ -1,5 +1,5 @@
 /*
- QtCurve (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
+ Vanish (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
 
  ----
 
@@ -657,7 +657,7 @@ static bool makeDir(const QString &dir, int mode)
                 baseEncoded.prepend("trying to create local folder ");
                 perror(baseEncoded.constData());
 #else
-                perror("trying to create QtCurve config folder ");
+                perror("trying to create Vanish config folder ");
 #endif
                 return false; // Couldn't create it :-(
             }

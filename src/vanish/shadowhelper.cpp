@@ -40,7 +40,7 @@
 #include <X11/Xatom.h>
 #endif
 
-namespace QtCurve
+namespace Vanish
 {
 
     const char *const ShadowHelper::netWMShadowAtomName("_KDE_NET_WM_SHADOW");

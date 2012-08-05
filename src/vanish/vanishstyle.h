@@ -2,7 +2,7 @@
 #define __QTCURVE_H__
 
 /*
-  QtCurve (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
 
   ----
 
@@ -58,7 +58,7 @@ class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
 
-namespace QtCurve
+namespace Vanish
 {
     class WindowManager;
     class BlurHelper;
@@ -355,16 +355,16 @@ namespace QtCurve
         QWidget                            *itsHoverWidget;
 #ifdef Q_WS_X11
         QDBusInterface                     *itsDBus;
-        QtCurve::ShadowHelper              *itsShadowHelper;
+        Vanish::ShadowHelper              *itsShadowHelper;
 #endif
         mutable QScrollBar                 *itsSViewSBar;
         mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
 #if !defined QTC_QT_ONLY
         KComponentData                     itsComponentData;
 #endif
-        QtCurve::WindowManager             *itsWindowManager;
-        QtCurve::BlurHelper                *itsBlurHelper;
-        QtCurve::ShortcutHandler           *itsShortcutHandler;
+        Vanish::WindowManager             *itsWindowManager;
+        Vanish::BlurHelper                *itsBlurHelper;
+        Vanish::ShortcutHandler           *itsShortcutHandler;
 #ifdef QTC_STYLE_SUPPORT
         QString                            itsName;
 #endif

@@ -42,7 +42,7 @@
 
 #include <QtWidgets/QWidget>
 
-namespace QtCurve
+namespace Vanish
 {
 #if QT_VERSION < 0x040600
     class QtCPointer : public QObject

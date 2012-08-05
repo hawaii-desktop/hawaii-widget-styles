@@ -44,7 +44,7 @@
 #include <QX11Info>
 #endif
 
-namespace QtCurve
+namespace Vanish
 {
 
     //___________________________________________________________

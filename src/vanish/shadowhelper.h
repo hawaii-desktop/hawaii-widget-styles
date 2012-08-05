@@ -37,7 +37,7 @@
 
 class QPixmap;
 
-namespace QtCurve
+namespace Vanish
 {
     //! handle shadow pixmaps passed to window manager via X property
     class ShadowHelper: public QObject

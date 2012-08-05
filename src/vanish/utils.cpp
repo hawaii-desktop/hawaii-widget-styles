@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
 
   ----
 
@@ -36,7 +36,7 @@
 #include <KDE/KWindowSystem>
 #endif
 
-namespace QtCurve
+namespace Vanish
 {
     namespace Utils
     {

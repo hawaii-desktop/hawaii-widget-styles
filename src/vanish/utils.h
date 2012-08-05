@@ -2,7 +2,7 @@
 #define _UTILS_H_
 
 /*
-  QtCurve (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
 
   ----
 
@@ -23,7 +23,7 @@
 
 #include <QtWidgets/QWidget>
 
-namespace QtCurve
+namespace Vanish
 {
     namespace Utils
     {

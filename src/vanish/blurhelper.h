@@ -46,7 +46,7 @@
 #include <X11/Xdefs.h>
 #endif
 
-namespace QtCurve
+namespace Vanish
 {
     class BlurHelper: public QObject
     {

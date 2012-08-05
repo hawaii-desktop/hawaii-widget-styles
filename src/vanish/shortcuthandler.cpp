@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
 
   ----
 
@@ -21,7 +21,7 @@
 #include "shortcuthandler.h"
 #include <QtWidgets>
 
-namespace QtCurve
+namespace Vanish
 {
 
     ShortcutHandler::ShortcutHandler(QObject *parent)

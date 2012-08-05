@@ -1,5 +1,5 @@
 /*
-  QtCurve (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
 
   ----
 
@@ -97,7 +97,7 @@ typedef QString(*_qt_filedialog_save_filename_hook)(QWidget *parent, const QStri
 extern _qt_filedialog_save_filename_hook qt_filedialog_save_filename_hook;
 #endif
 
-namespace QtCurve
+namespace Vanish
 {
 
 #if defined FIX_DISABLED_ICONS && !defined QTC_QT_ONLY
@@ -661,12 +661,12 @@ namespace QtCurve
     }
 #endif
 
-    class QtCurveDockWidgetTitleBar : public QWidget
+    class VanishDockWidgetTitleBar : public QWidget
     {
     public:
 
-        QtCurveDockWidgetTitleBar(QWidget *parent) : QWidget(parent) { }
-        virtual ~QtCurveDockWidgetTitleBar() { }
+        VanishDockWidgetTitleBar(QWidget *parent) : QWidget(parent) { }
+        virtual ~VanishDockWidgetTitleBar() { }
         QSize sizeHint() const {
             return QSize(0, 0);
         }
@@ -681,7 +681,7 @@ namespace QtCurve
 
         QStringList keys() const {
             QSet<QString> styles;
-            styles.insert("QtCurve");
+            styles.insert("Vanish");
 
 #ifdef QTC_STYLE_SUPPORT
             getStyles(kdeHome(), styles);
@@ -958,7 +958,7 @@ namespace QtCurve
     {
         const char *env = getenv(QTCURVE_PREVIEW_CONFIG);
         if (env && 0 == strcmp(env, QTCURVE_PREVIEW_CONFIG)) {
-            // To enable preview of QtCurve settings, the style config module will set QTCURVE_PREVIEW_CONFIG
+            // To enable preview of Vanish settings, the style config module will set QTCURVE_PREVIEW_CONFIG
             // and use CE_QtC_SetOptions to set options. If this is set, we do not use the QPixmapCache as it
             // will interfere with that of the kcm's widgets!
             itsIsPreview = PREVIEW_MDI;
@@ -1022,14 +1022,14 @@ namespace QtCurve
                                                       "compositingToggled", this, SLOT(compositingToggled()));
 
                 if (!qApp || QString(qApp->argv()[0]) != "kwin") {
-                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                    QDBusConnection::sessionBus().connect("org.kde.kwin", "/Vanish", "org.kde.Vanish",
                                                           "borderSizesChanged", this, SLOT(borderSizesChanged()));
                     if (opts.menubarHiding & HIDE_KWIN)
-                        QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                        QDBusConnection::sessionBus().connect("org.kde.kwin", "/Vanish", "org.kde.Vanish",
                                                               "toggleMenuBar", this, SLOT(toggleMenuBar(unsigned int)));
 
                     if (opts.statusbarHiding & HIDE_KWIN)
-                        QDBusConnection::sessionBus().connect("org.kde.kwin", "/QtCurve", "org.kde.QtCurve",
+                        QDBusConnection::sessionBus().connect("org.kde.kwin", "/Vanish", "org.kde.Vanish",
                                                               "toggleStatusBar", this, SLOT(toggleStatusBar(unsigned int)));
                 }
             }
@@ -1391,7 +1391,7 @@ namespace QtCurve
 
         if (NULL != getenv("QTCURVE_DEBUG")) {
             QByteArray l1(appName.toLatin1());
-            std::cout << "QtCurve: Application name: \"" << l1.constData() << "\"\n";
+            std::cout << "Vanish: Application name: \"" << l1.constData() << "\"\n";
         }
 
         if (APP_REKONQ == theThemedApp)
@@ -1939,7 +1939,7 @@ namespace QtCurve
                    qobject_cast<QSplitter *>(widget->parentWidget()) &&
                    widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
             widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
-            ((QDockWidget *)widget)->setTitleBarWidget(new QtCurveDockWidgetTitleBar(widget));
+            ((QDockWidget *)widget)->setTitleBarWidget(new VanishDockWidgetTitleBar(widget));
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         else if (opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
                  (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/) {
@@ -2010,7 +2010,7 @@ namespace QtCurve
 #else
         qobject_cast<KMenu *>(widget) && qobject_cast<KXmlGuiWindow *>(widget->parentWidget())
 #endif
-        && QLatin1String("QtCurvePreview")==widget->parentWidget()->objectName())*/) {
+        && QLatin1String("VanishPreview")==widget->parentWidget()->objectName())*/) {
             if (!IS_FLAT_BGND(opts.menuBgndAppearance) || 100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) {
                 Utils::addEventFilter(widget, this);
                 if ((100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
@@ -2401,7 +2401,7 @@ namespace QtCurve
             }
         } else if (qobject_cast<QDockWidget *>(widget) &&
                    ((QDockWidget *)widget)->titleBarWidget() &&
-                   dynamic_cast<QtCurveDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
+                   dynamic_cast<VanishDockWidgetTitleBar *>(((QDockWidget *)widget)->titleBarWidget()) &&
                    widget->parentWidget() &&
                    widget->parentWidget()->parentWidget() &&
                    widget->parentWidget()->parentWidget()->parentWidget() &&
@@ -2489,7 +2489,7 @@ namespace QtCurve
     }
 
     //
-    // QtCurve's menu's have a 2 pixel border all around - but want the top, and left edges to
+    // Vanish's menu's have a 2 pixel border all around - but want the top, and left edges to
     // active the nearest menu item. Therefore, when we get a mouse event in that region then
     // adjsut its position...
     static bool updateMenuBarEvent(QMouseEvent *event, QMenuBar *menu)
@@ -5098,7 +5098,7 @@ namespace QtCurve
             }
 #endif
             case QtC_PE_DrawBackground:
-                if (const QtCurve::Style::BgndOption *bgnd = qstyleoption_cast<const QtCurve::Style::BgndOption *>(option))
+                if (const Vanish::Style::BgndOption *bgnd = qstyleoption_cast<const Vanish::Style::BgndOption *>(option))
                     if (state & QtC_StateKWin) {
                         QColor col(palette.brush(QPalette::Window).color());
                         int    opacity(col.alphaF() * 100);
@@ -5156,7 +5156,7 @@ namespace QtCurve
         switch ((int)element) {
             case CE_QtC_SetOptions:
                 if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option)) {
-                    if (!painter && widget && QLatin1String("QtCurveConfigDialog") == widget->objectName()) {
+                    if (!painter && widget && QLatin1String("VanishConfigDialog") == widget->objectName()) {
                         Style *that = (Style *)this;
                         opts = preview->opts;
                         qtcCheckConfig(&opts);
@@ -5166,7 +5166,7 @@ namespace QtCurve
                 break;
             case CE_QtC_Preview:
                 if (const PreviewOption *preview = qstyleoption_cast<const PreviewOption *>(option)) {
-                    if (widget && widget && QLatin1String("QtCurveConfigDialog-GradientPreview") == widget->objectName()) {
+                    if (widget && widget && QLatin1String("VanishConfigDialog-GradientPreview") == widget->objectName()) {
                         Options      old = opts;
                         const QColor *use(buttonColors(option));
                         opts = preview->opts;
@@ -10813,7 +10813,7 @@ namespace QtCurve
         QRect         bgndRect(widget->rect()),
                       imgRect(bgndRect);
 
-        if (100 != opacity && !QtCurve::Utils::hasAlphaChannel(window))
+        if (100 != opacity && !Vanish::Utils::hasAlphaChannel(window))
             opacity = 100;
 
         p->setClipRegion(widget->rect(), Qt::IntersectClip);
@@ -12728,7 +12728,7 @@ namespace QtCurve
                 XChangeProperty(QX11Info::display(), w->window()->winId(),
                                 constQtCMenuSize, XA_CARDINAL, 16, PropModeReplace, (unsigned char *)&size, 1);
                 if (!itsDBus)
-                    itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
+                    itsDBus = new QDBusInterface("org.kde.kwin", "/Vanish", "org.kde.Vanish");
                 itsDBus->call(QDBus::NoBlock, "menuBarSize", (unsigned int)w->window()->winId(), (int)size);
             }
         }
@@ -12738,7 +12738,7 @@ namespace QtCurve
     {
         if (opts.statusbarHiding & HIDE_KWIN) {
             if (!itsDBus)
-                itsDBus = new QDBusInterface("org.kde.kwin", "/QtCurve", "org.kde.QtCurve");
+                itsDBus = new QDBusInterface("org.kde.kwin", "/Vanish", "org.kde.Vanish");
             itsDBus->call(QDBus::NoBlock, "statusBarState", (unsigned int)sb->window()->winId(), sb->isVisible());
         }
     }

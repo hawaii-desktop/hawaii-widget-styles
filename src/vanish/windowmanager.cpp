@@ -74,7 +74,7 @@
 #endif
 #endif
 
-namespace QtCurve
+namespace Vanish
 {
 
 #if QT_VERSION < 0x040600
