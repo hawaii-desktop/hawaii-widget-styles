@@ -32,9 +32,6 @@ namespace Vanish
             object->removeEventFilter(filter);
             object->installEventFilter(filter);
         }
-
-        extern bool compositingActive();
-        extern bool hasAlphaChannel(const QWidget *widget);
     }
 }
 

@@ -14,7 +14,6 @@ set(SOURCES
     vanishstyle.cpp
     windowmanager.cpp
     blurhelper.cpp
-    utils.cpp
     shortcuthandler.cpp
     colorutils.cpp
     common.cpp

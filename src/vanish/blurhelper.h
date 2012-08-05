@@ -168,9 +168,7 @@ namespace Vanish
 
              // konsole (thought that should be handled
              // internally by the application
-             widget->inherits("Konsole::MainWindow")) &&
-
-            Utils::hasAlphaChannel(widget);
+             widget->inherits("Konsole::MainWindow"));
     }
 }
 

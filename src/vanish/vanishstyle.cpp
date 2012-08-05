@@ -33,34 +33,6 @@
 // in CT_PushButton and CT_ComboBox
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
 
-#ifndef QTC_QT_ONLY
-#include <KDE/KApplication>
-#include <KDE/KAboutData>
-#include <KDE/KGlobalSettings>
-#include <KDE/KConfig>
-#include <KDE/KConfigGroup>
-#include <KDE/KIconLoader>
-#include <KDE/KIcon>
-#include <KDE/KColorScheme>
-#include <KDE/KStandardDirs>
-#include <KDE/KComponentData>
-#include <KDE/KTitleWidget>
-#include <KDE/KTabBar>
-#include <KDE/KFileDialog>
-#include <KDE/KPassivePopup>
-#include <KDE/KXmlGuiWindow>
-#include <KDE/KStandardAction>
-#include <KDE/KActionCollection>
-#include <KDE/KIconEffect>
-#include <KDE/KMenu>
-#include <KDE/KAboutApplicationDialog>
-
-#if QT_VERSION >= 0x040500
-#include <KDE/KIcon>
-#endif
-
-#endif // QTC_QT_ONLY
-
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
 #define FIX_DISABLED_ICONS
 
@@ -446,11 +418,7 @@ namespace Vanish
 
     static QColor blendColors(const QColor &foreground, const QColor &background, double alpha)
     {
-#if defined QTC_QT_ONLY
         return ColorUtils_mix(&background, &foreground, alpha);
-#else
-        return KColorUtils::mix(background, foreground, alpha);
-#endif
     }
 
     static void addStripes(QPainter *p, const QPainterPath &path, const QRect &rect, bool horizontal)
@@ -511,24 +479,13 @@ namespace Vanish
 
 #define SB_SUB2 ((QStyle::SubControl)(QStyle::SC_ScrollBarGroove << 1))
 
-#if defined QTC_QT_ONLY
     static void setRgb(QColor *col, const QStringList &rgb)
     {
         if (3 == rgb.size())
             *col = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
     }
-#endif
 
 #if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
-    static bool useQt3Settings()
-    {
-        static const char *full = getenv("KDE_FULL_SESSION");
-        static const char *vers = full ? getenv("KDE_SESSION_VERSION") : 0;
-        static bool       use   = full && (!vers || atoi(vers) < 4);
-
-        return use;
-    }
-
     static QString kdeHome()
     {
         static QString kdeHomePath;
@@ -537,7 +494,7 @@ namespace Vanish
             if (kdeHomePath.isEmpty()) {
                 QDir    homeDir(QDir::homePath());
                 QString kdeConfDir(QLatin1String("/.kde"));
-                if (!useQt3Settings() && homeDir.exists(QLatin1String(".kde4")))
+                if (homeDir.exists(QLatin1String(".kde4")))
                     kdeConfDir = QLatin1String("/.kde4");
                 kdeHomePath = QDir::homePath() + kdeConfDir;
             }
@@ -748,39 +705,6 @@ namespace Vanish
                (((qulonglong)1) << 38);
     }
 
-#if !defined QTC_QT_ONLY
-    static void parseWindowLine(const QString &line, QList<int> &data)
-    {
-        int len(line.length());
-
-        for (int i = 0; i < len; ++i)
-            switch (line[i].toLatin1()) {
-                case 'M':
-                    data.append(QStyle::SC_TitleBarSysMenu);
-                    break;
-                case '_':
-                    data.append(WINDOWTITLE_SPACER);
-                    break;
-                case 'H':
-                    data.append(QStyle::SC_TitleBarContextHelpButton);
-                    break;
-                case 'L':
-                    data.append(QStyle::SC_TitleBarShadeButton);
-                    break;
-                case 'I':
-                    data.append(QStyle::SC_TitleBarMinButton);
-                    break;
-                case 'A':
-                    data.append(QStyle::SC_TitleBarMaxButton);
-                    break;
-                case 'X':
-                    data.append(QStyle::SC_TitleBarCloseButton);
-                default:
-                    break;
-            }
-    }
-#endif
-
     static const QWidget *getWidget(const QPainter *p)
     {
         if (p) {
@@ -872,24 +796,6 @@ namespace Vanish
         if (!initial)
             freeColors();
 
-#if !defined QTC_QT_ONLY
-        if (initial) {
-            if (KGlobal::hasMainComponent())
-                itsComponentData = KGlobal::mainComponent();
-            else {
-                QString name(QApplication::applicationName());
-
-                if (name.isEmpty())
-                    name = qAppName();
-
-                if (name.isEmpty())
-                    name = "QtApp";
-
-                itsComponentData = KComponentData(name.toLatin1(), name.toLatin1(), KComponentData::SkipMainComponentRegistration);
-            }
-        }
-#endif
-
         if (itsIsPreview) {
             if (PREVIEW_WINDOW != itsIsPreview)
                 opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
@@ -900,9 +806,9 @@ namespace Vanish
                 rcFile = themeFile(kdeHome(), itsName);
 
                 if (rcFile.isEmpty()) {
-                    rcFile = themeFile(KDE_PREFIX(useQt3Settings() ? 3 : 4), itsName, useQt3Settings());
+                    rcFile = themeFile(KDE_PREFIX(4), itsName, false);
                     if (rcFile.isEmpty())
-                        rcFile = themeFile(KDE_PREFIX(useQt3Settings() ? 4 : 3), itsName, !useQt3Settings());
+                        rcFile = themeFile(KDE_PREFIX(4), itsName, true);
                 }
             }
             qtcReadConfig(rcFile, &opts);
@@ -922,11 +828,6 @@ namespace Vanish
         // Set defaults for Hover and Focus, these will be changed when KDE4 palette is applied...
         shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsFocusCols);
         shadeColors(QApplication::palette().color(QPalette::Active, QPalette::Highlight), itsMouseOverCols);
-        // Dont setup KDE4 fonts/colours here - seems to mess things up when using proxy styles.
-        // See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638629
-        //#if !defined QTC_QT_ONLY
-        //    setupKde4();
-        //#endif
 
         itsWindowManager->initialize(opts.windowDrag, opts.windowDragWhiteList.toList(), opts.windowDragBlackList.toList());
 
@@ -1142,19 +1043,6 @@ namespace Vanish
             qtcCalcRingAlphas(&itsBackgroundCols[ORIGINAL_SHADE]);
 
         itsBlurHelper->setEnabled(100 != opts.bgndOpacity || 100 != opts.dlgOpacity || 100 != opts.menuBgndOpacity);
-
-#if !defined QTC_QT_ONLY
-        // Ensure the link to libkio is not stripped, by placing a call to a kio function.
-        // NOTE: This call will never actually happen, its only here so that the qtcurve.so
-        // contains a kio link so that this is not removed by some 'optimisation' of the
-        // link process.
-        if (itsPos.x() > 65534)
-            (void)KFileDialog::getSaveFileName();
-
-        // We need to set the decoration colours for the preview now...
-        if (itsIsPreview)
-            setDecorationColors();
-#endif
     }
 
     Style::~Style()
@@ -1303,7 +1191,7 @@ namespace Vanish
             opts.menuBgndAppearance = APPEARANCE_FLAT;
         }
 
-        BASE_STYLE::polish(app);
+        QCommonStyle::polish(app);
         if (opts.hideShortcutUnderline)
             Utils::addEventFilter(app, itsShortcutHandler);
     }
@@ -1457,11 +1345,6 @@ namespace Vanish
         // Force this to be re-generated!
         if (SHADE_BLEND_SELECTED == opts.menuStripe)
             opts.customMenuStripeColor = Qt::black;
-#if !defined QTC_QT_ONLY
-        // Only set palette here...
-        if (kapp)
-            setDecorationColors();
-#endif
     }
 
     static inline void setTranslucentBackground(QWidget *widget)
@@ -1482,13 +1365,11 @@ namespace Vanish
         return wid;
     }
 
-#ifdef QTC_QT_ONLY
     static bool parentIs(QWidget *w, int level, const char *className)
     {
         QWidget *wid = getParent(w, level);
         return wid && wid->inherits(className);
     }
-#endif
 
     void Style::polish(QWidget *widget)
     {
@@ -1616,11 +1497,7 @@ namespace Vanish
                       qobject_cast<QComboBox *>(widget->parentWidget()->parentWidget()) &&
                       !static_cast<QComboBox *>(widget->parentWidget()->parentWidget())->isEditable()) &&
                     // Exclude KAboutDialog...
-#ifdef QTC_QT_ONLY
                     !parentIs(widget, 5, "KAboutApplicationDialog") &&
-#else
-                    !qobject_cast<KAboutApplicationDialog *>(getParent(widget, 5)) &&
-#endif
                     (qobject_cast<QTreeView *>(widget) || (qobject_cast<QListView *>(widget) && QListView::IconMode != ((QListView *)widget)->viewMode())))
                 itemView->setAlternatingRowColors(true);
         }
@@ -1687,11 +1564,7 @@ namespace Vanish
             if (WM_DRAG_ALL == opts.windowDrag &&
                     ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
                     widget->parentWidget() && widget->parentWidget()->parentWidget() && ::qobject_cast<QFrame *>(widget->parentWidget()) &&
-#ifdef QTC_QT_ONLY
                     widget->parentWidget()->parentWidget()->inherits("KTitleWidget")
-#else
-                    ::qobject_cast<KTitleWidget *>(widget->parentWidget()->parentWidget())
-#endif
                )
                 ((QLabel *)widget)->setTextInteractionFlags(((QLabel *)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
 
@@ -1760,12 +1633,7 @@ namespace Vanish
                 //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 Utils::addEventFilter(widget, this);
 
-#ifdef QTC_QT_ONLY
-                if (widget->parent() && widget->parent()->inherits("KTitleWidget"))
-#else
-                if (widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
-#endif
-                {
+                if (widget->parent() && widget->parent()->inherits("KTitleWidget")) {
                     if (CUSTOM_BGND)
                         frame->setAutoFillBackground(false);
                     else
@@ -1795,13 +1663,7 @@ namespace Vanish
                 }
             }
 
-        if (qobject_cast<QMenu *>(widget)/* && !(widget->parentWidget() &&
-#ifdef QTC_QT_ONLY
-        widget->inherits("KMenu") && widget->parentWidget()->inherits("KXmlGuiWindow")
-#else
-        qobject_cast<KMenu *>(widget) && qobject_cast<KXmlGuiWindow *>(widget->parentWidget())
-#endif
-        && QLatin1String("VanishPreview")==widget->parentWidget()->objectName())*/) {
+        if (qobject_cast<QMenu *>(widget)) {
             if (!IS_FLAT_BGND(opts.menuBgndAppearance) || 100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) {
                 Utils::addEventFilter(widget, this);
                 if ((100 != opts.menuBgndOpacity || !(opts.square & SQUARE_POPUP_MENUS)) && !widget->testAttribute(Qt::WA_TranslucentBackground))
@@ -1847,11 +1709,7 @@ namespace Vanish
             static_cast<QMainWindow *>(widget)->menuWidget()->setStyle(this);
 
         if (APP_QTCREATOR == theThemedApp && qobject_cast<QDialog *>(widget) &&
-#ifdef QTC_QT_ONLY
                 widget->inherits("KFileDialog")
-#else
-                qobject_cast<KFileDialog *>(widget)
-#endif
            ) {
             QToolBar *tb = getToolBarChild(widget);
 
@@ -2039,7 +1897,7 @@ namespace Vanish
     {
         if (opts.hideShortcutUnderline)
             app->removeEventFilter(itsShortcutHandler);
-        BASE_STYLE::unpolish(app);
+        QCommonStyle::unpolish(app);
     }
 
     void Style::unpolish(QWidget *widget)
@@ -2169,12 +2027,7 @@ namespace Vanish
                 //             if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 widget->removeEventFilter(this);
 
-#ifdef QTC_QT_ONLY
-                if (widget->parent() && widget->parent()->inherits("KTitleWidget"))
-#else
-                if (widget->parent() && qobject_cast<KTitleWidget *>(widget->parent()))
-#endif
-                {
+                if (widget->parent() && widget->parent()->inherits("KTitleWidget")) {
                     if (CUSTOM_BGND)
                         frame->setAutoFillBackground(true);
                     else
@@ -2347,10 +2200,7 @@ namespace Vanish
             case QEvent::Resize:
                 if (!(opts.square & SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer")) {
                     QWidget *widget = static_cast<QWidget *>(object);
-                    if (Utils::hasAlphaChannel(widget))
-                        widget->clearMask();
-                    else
-                        widget->setMask(windowMask(widget->rect(), opts.round > ROUND_SLIGHT));
+                    widget->setMask(windowMask(widget->rect(), opts.round > ROUND_SLIGHT));
                     return false;
                 }
                 break;
@@ -2506,10 +2356,7 @@ namespace Vanish
                     }
                 } else if (!(opts.square & SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer")) {
                     QWidget *widget = static_cast<QWidget *>(object);
-                    if (Utils::hasAlphaChannel(widget))
-                        widget->clearMask();
-                    else
-                        widget->setMask(windowMask(widget->rect(), opts.round > ROUND_SLIGHT));
+                    widget->setMask(windowMask(widget->rect(), opts.round > ROUND_SLIGHT));
                     return false;
                 }
                 break;
@@ -2617,7 +2464,7 @@ namespace Vanish
                 break;
         }
 
-        return BASE_STYLE::eventFilter(object, event);
+        return QCommonStyle::eventFilter(object, event);
     }
 
     void Style::timerEvent(QTimerEvent *event)
@@ -2637,7 +2484,7 @@ namespace Vanish
     {
         switch ((int)metric) {
             case PM_ToolTipLabelFrameWidth:
-                return !ROUNDED || opts.square & SQUARE_TOOLTIPS ? BASE_STYLE::pixelMetric(metric, option, widget) : 3;
+                return !ROUNDED || opts.square & SQUARE_TOOLTIPS ? QCommonStyle::pixelMetric(metric, option, widget) : 3;
             case PM_MdiSubWindowFrameWidth:
                 return 3;
             case PM_DockWidgetTitleMargin:
@@ -2648,7 +2495,7 @@ namespace Vanish
                 return 2;
             case PM_ToolBarExtensionExtent:
                 return 15;
-#ifdef QTC_QT_ONLY
+                // TODO: Size from settings
             case PM_SmallIconSize:
                 return 16;
             case PM_ToolBarIconSize:
@@ -2656,23 +2503,6 @@ namespace Vanish
             case PM_IconViewIconSize:
             case PM_LargeIconSize:
                 return 32;
-#else
-#if QT_VERSION >= 0x040500
-            case PM_TabCloseIndicatorWidth:
-            case PM_TabCloseIndicatorHeight:
-#endif
-            case PM_SmallIconSize:
-            case PM_ButtonIconSize:
-                return KIconLoader::global()->currentSize(KIconLoader::Small);
-            case PM_ToolBarIconSize:
-                return KIconLoader::global()->currentSize(KIconLoader::Toolbar);
-            case PM_IconViewIconSize:
-            case PM_LargeIconSize:
-                return KIconLoader::global()->currentSize(KIconLoader::Dialog);
-            case PM_MessageBoxIconSize:
-                // TODO return KIconLoader::global()->currentSize(KIconLoader::MessageBox);
-                return KIconLoader::SizeHuge;
-#endif
 #if QT_VERSION >= 0x040500
             case PM_SubMenuOverlap:
                 return -2;
@@ -2821,7 +2651,7 @@ namespace Vanish
                         ++size;
                     return size;
                 }
-                return BASE_STYLE::pixelMetric(metric, option, widget);
+                return QCommonStyle::pixelMetric(metric, option, widget);
             case PM_SliderLength:
                 return (SLIDER_CIRCULAR == opts.sliderStyle
                         ? CIRCULAR_SLIDER_SIZE
@@ -2883,24 +2713,16 @@ namespace Vanish
                 // asks for these options, it only passes in a QStyleOption  not a QStyleOptionTab
                 //.........
             case PM_TabBarBaseHeight:
-#ifdef QTC_QT_ONLY
                 if (widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#else
-                if (widget && qobject_cast<const KTabBar *>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#endif
                     return 10;
-                return BASE_STYLE::pixelMetric(metric, option, widget);
+                return QCommonStyle::pixelMetric(metric, option, widget);
             case PM_TabBarBaseOverlap:
-#ifdef QTC_QT_ONLY
                 if (widget && widget->inherits("KTabBar") && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#else
-                if (widget && qobject_cast<const KTabBar *>(widget) && !qstyleoption_cast<const QStyleOptionTab *>(option))
-#endif
                     return 0;
                 // Fall through!
                 //.........
             default:
-                return BASE_STYLE::pixelMetric(metric, option, widget);
+                return QCommonStyle::pixelMetric(metric, option, widget);
         }
     }
 
@@ -2911,9 +2733,9 @@ namespace Vanish
             case SH_Menu_Mask:
                 if ((SH_ToolTip_Mask == hint && (opts.square & SQUARE_TOOLTIPS)) ||
                         (SH_Menu_Mask == hint && (opts.square & SQUARE_POPUP_MENUS)))
-                    return BASE_STYLE::styleHint(hint, option, widget, returnData);
+                    return QCommonStyle::styleHint(hint, option, widget, returnData);
                 else {
-                    if (!Utils::hasAlphaChannel(widget) && (!widget || widget->isWindow()))
+                    if (!widget || widget->isWindow())
                         if (QStyleHintReturnMask *mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData))
                             mask->region = windowMask(option->rect, opts.round > ROUND_SLIGHT);
                     return true;
@@ -3041,6 +2863,7 @@ namespace Vanish
             case SH_FormLayoutWrapPolicy:
                 return QFormLayout::DontWrapRows;
 #endif
+                // TODO: From settings
 #if !defined QTC_QT_ONLY
             case SH_DialogButtonBox_ButtonsHaveIcons:
                 return KGlobalSettings::showIconsOnPushButtons();
@@ -3057,30 +2880,18 @@ namespace Vanish
                         return CE_QtC_KCapacityBar;
                     }
 #endif
-                return BASE_STYLE::styleHint(hint, option, widget, returnData);
+                return QCommonStyle::styleHint(hint, option, widget, returnData);
         }
     }
 
     QPalette Style::standardPalette() const
     {
 #if defined QTC_QT_ONLY
-        return BASE_STYLE::standardPalette();
+        return QCommonStyle::standardPalette();
 #else
         return KGlobalSettings::createApplicationPalette(KSharedConfig::openConfig(itsComponentData));
 #endif
     }
-
-#if defined QTC_QT_ONLY
-#include "dialogpixmaps.h"
-
-    static QIcon load(const unsigned int len, const unsigned char *data)
-    {
-        QImage img;
-        img.loadFromData(data, len);
-
-        return QIcon(QPixmap::fromImage(img));
-    }
-#endif
 
     QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
     {
@@ -3228,7 +3039,7 @@ namespace Vanish
             default:
                 break;
         }
-        return BASE_STYLE::standardIconImplementation(pix, option, widget);
+        return QCommonStyle::standardIconImplementation(pix, option, widget);
     }
 
     int Style::layoutSpacingImplementation(QSizePolicy::ControlType control1, QSizePolicy::ControlType control2, Qt::Orientation orientation,
@@ -3249,7 +3060,6 @@ namespace Vanish
         bool           reverse(Qt::RightToLeft == option->direction);
 
         switch ((int)element) {
-#if (QT_VERSION >= 0x040500) && !defined QTC_QT_ONLY
             case PE_IndicatorTabClose: {
                 int         size(pixelMetric(QStyle::PM_SmallIconSize));
                 QIcon::Mode mode(state & State_Enabled
@@ -3265,7 +3075,6 @@ namespace Vanish
                                ? QIcon::On : QIcon::Off));
                 break;
             }
-#endif
             case PE_Widget:
                 if (widget && widget->testAttribute(Qt::WA_StyledBackground) &&
                         ((!widget->testAttribute(Qt::WA_NoSystemBackground) &&
@@ -3552,13 +3361,8 @@ namespace Vanish
                 if (isOOWidget(widget) && r.height() < 22)
                     break;
 
-#ifdef QTC_QT_ONLY
                 if (widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
                     break;
-#else
-                if (widget && widget->parent() && qobject_cast<const KTitleWidget *>(widget->parent()))
-                    break;
-#endif
                 else if (widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent())) {
                     if (opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
                         drawPrimitive(PE_FrameMenu, option, painter, widget);
@@ -3652,7 +3456,7 @@ namespace Vanish
 
                             if (opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100 == opts.bgndOpacity &&
                                     widget && widget->parentWidget() && !inQAbstractItemView/* &&
-           widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
+       widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
                                 painter->setPen(widget->parentWidget()->palette().background().color());
                                 painter->drawRect(r);
                                 painter->drawRect(r.adjusted(1, 1, -1, -1));
@@ -3712,7 +3516,7 @@ namespace Vanish
                 if (const QStyleOptionTabBarBase *tbb = qstyleoption_cast<const QStyleOptionTabBarBase *>(option)) {
                     if (tbb->shape != QTabBar::RoundedNorth && tbb->shape != QTabBar::RoundedWest &&
                             tbb->shape != QTabBar::RoundedSouth && tbb->shape != QTabBar::RoundedEast)
-                        BASE_STYLE::drawPrimitive(element, option, painter, widget);
+                        QCommonStyle::drawPrimitive(element, option, painter, widget);
                     else {
                         static const int constSidePad = 16 * 2;
                         const QColor *use(backgroundColors(option));
@@ -4679,17 +4483,15 @@ namespace Vanish
                 // TODO: This is the only part left from QWindowsStyle - but I dont think its actually used!
                 // case PE_IndicatorProgressChunk:
             case PE_PanelTipLabel: {
-                bool         haveAlpha = Utils::hasAlphaChannel(widget)  && APP_OPERA != theThemedApp,
-                             rounded = !(opts.square & SQUARE_TOOLTIPS) && APP_OPERA != theThemedApp;
+                bool rounded = !(opts.square & SQUARE_TOOLTIPS) && APP_OPERA != theThemedApp;
                 QPainterPath path = rounded ? buildPath(QRectF(r), WIDGET_OTHER, ROUNDED_ALL, MENU_AND_TOOLTIP_RADIUS) : QPainterPath();
                 QColor       col = palette.toolTipBase().color();
 
                 painter->save();
                 if (rounded)
                     painter->setRenderHint(QPainter::Antialiasing, true);
-                if (haveAlpha)
-                    col.setAlphaF(0.875);
-                drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_TOOLTIP, !haveAlpha);
+                col.setAlphaF(0.875);
+                drawBevelGradient(col, painter, r, path, true, false, opts.tooltipAppearance, WIDGET_TOOLTIP, false);
                 if (IS_FLAT(opts.tooltipAppearance)) {
                     painter->setPen(QPen(palette.toolTipText(), 0));
                     drawRect(painter, r);
@@ -4699,7 +4501,7 @@ namespace Vanish
             }
             // Fall through!
             default:
-                BASE_STYLE::drawPrimitive(element, option, painter, widget);
+                QCommonStyle::drawPrimitive(element, option, painter, widget);
                 break;
         }
     }
@@ -5015,10 +4817,6 @@ namespace Vanish
 #else
                         const int margin(4);
                         QRect titleRect(visualRect(dwOpt->direction, r, r.adjusted(margin, 0, -margin * 2 - 26, 0)));
-#endif
-#if !defined QTC_QT_ONLY
-                        if (opts.dwtSettings & DWT_FONT_AS_PER_TITLEBAR)
-                            painter->setFont(KGlobalSettings::windowTitleFont());
 #endif
                         QFontMetrics fm(painter->fontMetrics());
                         QString      title(fm.elidedText(dwOpt->title, Qt::ElideRight, titleRect.width(), QPalette::WindowText));
@@ -6762,12 +6560,12 @@ namespace Vanish
                                 drawBevelGradient(shade(palette.background().color(), TO_FACTOR(opts.crHighlight)), painter,
                                                   highlightRect, true, false, opts.selectionAppearance, WIDGET_SELECTION);
                         }
-                        BASE_STYLE::drawControl(element, &copy, painter, widget);
+                        QCommonStyle::drawControl(element, &copy, painter, widget);
                         break;
                     }
                 // Fall through!
             default:
-                BASE_STYLE::drawControl(element, option, painter, widget);
+                QCommonStyle::drawControl(element, option, painter, widget);
         }
     }
 
@@ -7514,20 +7312,7 @@ namespace Vanish
 
                     opt.state = State_Horizontal | State_Enabled | State_Raised | (active ? State_Active : State_None);
 
-#ifdef QTC_QT_ONLY
                     QPainterPath path;
-#else
-#if KDE_IS_VERSION(4, 3, 0)
-                    QPainterPath path(round < ROUND_SLIGHT
-                                      ? QPainterPath()
-                                      : buildPath(QRectF(state & QtC_StateKWinNoBorder ? tr : tr.adjusted(1, 1, -1, 0)),
-                                                  WIDGET_MDI_WINDOW_TITLE, state & QtC_StateKWin && state & QtC_StateKWinTabDrag
-                                                  ? ROUNDED_ALL : ROUNDED_TOP,
-                                                  (round > ROUND_SLIGHT /*&& kwin*/ ? 6.0 : 2.0)));
-#else
-                    QPainterPath path;
-#endif
-#endif
                     if (!kwin && !CUSTOM_BGND)
                         painter->fillRect(tr, borderCol);
 
@@ -7666,13 +7451,9 @@ namespace Vanish
                                                ? QRect(r.x(), captionRect.y(), r.width(), captionRect.height())
                                                : captionRect);
 
-#ifdef QTC_QT_ONLY
                         QFont         font(painter->font());
                         font.setBold(true);
                         painter->setFont(font);
-#else
-                        painter->setFont(KGlobalSettings::windowTitleFont());
-#endif
 
                         QFontMetrics fm(painter->fontMetrics());
                         QString str(fm.elidedText(titleBar->text, Qt::ElideRight, textRect.width(), QPalette::WindowText));
@@ -8211,7 +7992,7 @@ namespace Vanish
                 }
                 break;
             default:
-                BASE_STYLE::drawComplexControl(control, option, painter, widget);
+                QCommonStyle::drawComplexControl(control, option, painter, widget);
                 break;
         }
     }
@@ -8220,7 +8001,7 @@ namespace Vanish
     void Style::drawItemTextWithRole(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled,
                                      const QString &text, QPalette::ColorRole textRole) const
     {
-        BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+        QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
     }
 
     void Style::drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pal, bool enabled, const QString &text,
@@ -8234,17 +8015,17 @@ namespace Vanish
 
                 if (itsInactiveChangeSelectionColor && QPalette::Inactive == p.currentColorGroup())
                     p.setCurrentColorGroup(QPalette::Active);
-                BASE_STYLE::drawItemText(painter, rect, flags, p, enabled, text, QPalette::HighlightedText);
+                QCommonStyle::drawItemText(painter, rect, flags, p, enabled, text, QPalette::HighlightedText);
                 return;
             }
         }
 
-        BASE_STYLE::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+        QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
     }
 
     QSize Style::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
     {
-        QSize newSize(BASE_STYLE::sizeFromContents(type, option, size, widget));
+        QSize newSize(QCommonStyle::sizeFromContents(type, option, size, widget));
 
         switch (type) {
             case CT_TabBarTab:
@@ -8504,7 +8285,7 @@ namespace Vanish
                 bool                           verticalTitleBar = v2 ? v2->verticalTitleBar : false;
                 int                            m = pixelMetric(PM_DockWidgetTitleMargin, option, widget);
 
-                rect = BASE_STYLE::subElementRect(element, option, widget);
+                rect = QCommonStyle::subElementRect(element, option, widget);
 
                 if (verticalTitleBar)
                     rect.adjust(0, 0, 0, -m);
@@ -8516,9 +8297,9 @@ namespace Vanish
             }
 #if QT_VERSION >= 0x040500
             case SE_TabBarTabLeftButton:
-                return BASE_STYLE::subElementRect(element, option, widget).translated(-2, -1);
+                return QCommonStyle::subElementRect(element, option, widget).translated(-2, -1);
             case SE_TabBarTabRightButton:
-                return BASE_STYLE::subElementRect(element, option, widget).translated(2, -1);
+                return QCommonStyle::subElementRect(element, option, widget).translated(2, -1);
             case SE_TabBarTabText:
                 if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option)) {
                     QStyleOptionTabV3 tabV2(*tab);
@@ -8597,7 +8378,7 @@ namespace Vanish
 #endif
             case SE_RadioButtonIndicator:
                 rect = visualRect(option->direction, option->rect,
-                                  BASE_STYLE::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
+                                  QCommonStyle::subElementRect(element, option, widget)).adjusted(0, 0, 1, 1);
                 break;
             case SE_ProgressBarContents:
                 return opts.fillProgress
@@ -8626,13 +8407,13 @@ namespace Vanish
                     else
                         rect.adjust(-2, -2, 2, 2);
                 } else {
-                    rect = BASE_STYLE::subElementRect(element, option, widget);
+                    rect = QCommonStyle::subElementRect(element, option, widget);
                     if (DO_EFFECT)
                         rect.adjust(1, 1, -1, -1);
                 }
                 return rect;
             default:
-                return BASE_STYLE::subElementRect(element, option, widget);
+                return QCommonStyle::subElementRect(element, option, widget);
         }
 
         return visualRect(option->direction, option->rect, rect);
@@ -8885,7 +8666,7 @@ namespace Vanish
                                 ret = QRect(0, sliderstart, sbextent, sliderLength);
                             break;
                         default:
-                            ret = BASE_STYLE::subControlRect(control, option, subControl, widget);
+                            ret = QCommonStyle::subControlRect(control, option, subControl, widget);
                             break;
                     }
                     return visualRect(scrollBar->direction/*Qt::LeftToRight*/, scrollBar->rect, ret);
@@ -8896,7 +8677,7 @@ namespace Vanish
                     if (SLIDER_TRIANGULAR == opts.sliderStyle) {
                         int   tickSize(pixelMetric(PM_SliderTickmarkOffset, option, widget)),
                               mod = MO_GLOW == opts.coloredMouseOver && DO_EFFECT ? 2 : 0;
-                        QRect rect(BASE_STYLE::subControlRect(control, option, subControl, widget));
+                        QRect rect(QCommonStyle::subControlRect(control, option, subControl, widget));
 
                         switch (subControl) {
                             case SC_SliderHandle:
@@ -9110,7 +8891,7 @@ namespace Vanish
                 break;
         }
 
-        return BASE_STYLE::subControlRect(control, option, subControl, widget);
+        return QCommonStyle::subControlRect(control, option, subControl, widget);
     }
 
     QStyle::SubControl Style::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
@@ -9142,7 +8923,7 @@ namespace Vanish
                 break;
         }
 
-        return BASE_STYLE::hitTestComplexControl(control, option,  pos, widget);
+        return QCommonStyle::hitTestComplexControl(control, option,  pos, widget);
     }
 
     void Style::drawSideBarButton(QPainter *painter, const QRect &r, const QStyleOption *option, const QWidget *widget) const
@@ -10228,7 +10009,7 @@ namespace Vanish
         QRect         bgndRect(widget->rect()),
                       imgRect(bgndRect);
 
-        if (100 != opacity && !Vanish::Utils::hasAlphaChannel(window))
+        if (opacity != 100)
             opacity = 100;
 
         p->setClipRegion(widget->rect(), Qt::IntersectClip);
@@ -10403,7 +10184,7 @@ namespace Vanish
                     buildSplitPath(inner, round, qtcGetRadius(&opts, inner.width(), inner.height(), w, RADIUS_INTERNAL), topPath, botPath);
 
                     p->setPen((enabled || BORDER_SUNKEN == borderProfile) /*&&
-            (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
+        (BORDER_RAISED==borderProfile || BORDER_LIGHT==borderProfile || hasFocus || APPEARANCE_FLAT!=app)*/
                               ? tl
                               : option->palette.background().color());
                     p->drawPath(topPath);
@@ -10412,11 +10193,11 @@ namespace Vanish
                                (WIDGET_ENTRY != w && doBlend && BORDER_SUNKEN == borderProfile)))) {
                         if (!hasFocus && !hasMouseOver && BORDER_LIGHT != borderProfile && WIDGET_SCROLLVIEW != w)
                             p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
-                    ? checkColour(option, QPalette::Window)
-                    : WIDGET_ENTRY==w && !hasFocus
-                        ? checkColour(option, QPalette::Base)
-                        : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                                                            WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
+                ? checkColour(option, QPalette::Window)
+                : WIDGET_ENTRY==w && !hasFocus
+                    ? checkColour(option, QPalette::Base)
+                    : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                                                        WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
                                 ? br
                                 : checkColour(option, QPalette::Window));
                         p->drawPath(botPath);
@@ -11544,7 +11325,6 @@ namespace Vanish
     const QColor *Style::getMdiColors(const QStyleOption *option, bool active) const
     {
         if (!itsActiveMdiColors) {
-#if defined QTC_QT_ONLY
             itsActiveMdiTextColor = option ? option->palette.text().color() : QApplication::palette().text().color();
             itsMdiTextColor = option ? option->palette.text().color() : QApplication::palette().text().color();
 
@@ -11586,25 +11366,6 @@ namespace Vanish
                 }
                 f.close();
             }
-#else
-            Q_UNUSED(option)
-
-            QColor col = KGlobalSettings::activeTitleColor();
-
-            if (col != itsBackgroundCols[ORIGINAL_SHADE]) {
-                itsActiveMdiColors = new QColor [TOTAL_SHADES + 1];
-                shadeColors(col, itsActiveMdiColors);
-            }
-
-            col = KGlobalSettings::inactiveTitleColor();
-            if (col != itsBackgroundCols[ORIGINAL_SHADE]) {
-                itsMdiColors = new QColor [TOTAL_SHADES + 1];
-                shadeColors(col, itsMdiColors);
-            }
-
-            itsActiveMdiTextColor = KGlobalSettings::activeTextColor();
-            itsMdiTextColor = KGlobalSettings::inactiveTextColor();
-#endif
 
             if (!itsActiveMdiColors)
                 itsActiveMdiColors = (QColor *)itsBackgroundCols;
@@ -11631,43 +11392,6 @@ namespace Vanish
             itsMdiButtons[1].append(SC_TitleBarMaxButton);
             itsMdiButtons[1].append(WINDOWTITLE_SPACER);
             itsMdiButtons[1].append(SC_TitleBarCloseButton);
-
-#if !defined QTC_QT_ONLY
-            KConfig      cfg("kwinrc");
-            KConfigGroup grp(&cfg, "Style");
-
-            if (grp.readEntry("CustomButtonPositions", false)) {
-                QString left = grp.readEntry("ButtonsOnLeft"),
-                        right = grp.readEntry("ButtonsOnRight");
-
-                if (!left.isEmpty() || !right.isEmpty())
-                    itsMdiButtons[0].clear(), itsMdiButtons[1].clear();
-
-                if (!left.isEmpty())
-                    parseWindowLine(left, itsMdiButtons[0]);
-
-                if (!right.isEmpty())
-                    parseWindowLine(right, itsMdiButtons[1]);
-
-                // Designer uses shade buttons, not min/max - so if we dont have shade in our kwin config. then add this button near the max button...
-                if (-1 == itsMdiButtons[0].indexOf(SC_TitleBarShadeButton) && -1 == itsMdiButtons[1].indexOf(SC_TitleBarShadeButton)) {
-                    int maxPos = itsMdiButtons[0].indexOf(SC_TitleBarMaxButton);
-
-                    if (-1 == maxPos) { // Left doesnt have max button, assume right does and add shade there
-                        int minPos = itsMdiButtons[1].indexOf(SC_TitleBarMinButton);
-                        maxPos = itsMdiButtons[1].indexOf(SC_TitleBarMaxButton);
-
-                        itsMdiButtons[1].insert(minPos < maxPos ? (minPos == -1 ? 0 : minPos)
-                                                    : (maxPos == -1 ? 0 : maxPos), SC_TitleBarShadeButton);
-                    } else { // Add to left button
-                        int minPos = itsMdiButtons[0].indexOf(SC_TitleBarMinButton);
-
-                        itsMdiButtons[1].insert(minPos > maxPos ? (minPos == -1 ? 0 : minPos)
-                                                    : (maxPos == -1 ? 0 : maxPos), SC_TitleBarShadeButton);
-                    }
-                }
-            }
-#endif
         }
     }
 
@@ -11895,95 +11619,11 @@ namespace Vanish
         unregisterArgbWidget(w);
     }
 
-#if !defined QTC_QT_ONLY
-    void Style::setupKde4()
-    {
-        if (kapp)
-            setDecorationColors();
-        else {
-            applyKdeSettings(true);
-            applyKdeSettings(false);
-        }
-    }
-
-    void Style::setDecorationColors()
-    {
-        KColorScheme kcs(QPalette::Active);
-        if (opts.coloredMouseOver)
-            shadeColors(kcs.decoration(KColorScheme::HoverColor).color(), itsMouseOverCols);
-        shadeColors(kcs.decoration(KColorScheme::FocusColor).color(), itsFocusCols);
-    }
-
-    void Style::applyKdeSettings(bool pal)
-    {
-        if (pal) {
-            if (!kapp)
-                QApplication::setPalette(standardPalette());
-            setDecorationColors();
-        } else {
-            KConfigGroup g(KGlobal::config(), "General");
-            QFont        mnu = g.readEntry("menuFont", QApplication::font());
-
-            QApplication::setFont(g.readEntry("font", QApplication::font()));
-            QApplication::setFont(mnu, "QMenuBar");
-            QApplication::setFont(mnu, "QMenu");
-            QApplication::setFont(mnu, "KPopupTitle");
-            QApplication::setFont(KGlobalSettings::toolBarFont(), "QToolBar");
-        }
-    }
-#endif
-
     void Style::kdeGlobalSettingsChange(int type, int)
     {
-#if defined QTC_QT_ONLY
         Q_UNUSED(type)
-#else
-        switch (type) {
-            case KGlobalSettings::StyleChanged: {
-                KGlobal::config()->reparseConfiguration();
-                if (itsUsePixmapCache)
-                    QPixmapCache::clear();
-                init(false);
 
-                QWidgetList                tlw = QApplication::topLevelWidgets();
-                QWidgetList::ConstIterator it(tlw.begin()),
-                            end(tlw.end());
-
-                for (; it != end; ++it)
-                    (*it)->update();
-                break;
-            }
-            case KGlobalSettings::PaletteChanged:
-                KGlobal::config()->reparseConfiguration();
-                applyKdeSettings(true);
-                if (itsUsePixmapCache)
-                    QPixmapCache::clear();
-                break;
-            case KGlobalSettings::FontChanged:
-                KGlobal::config()->reparseConfiguration();
-                applyKdeSettings(false);
-                break;
-        }
-#endif
-
-        itsBlurHelper->setEnabled(Utils::compositingActive());
+        itsBlurHelper->setEnabled(false);
         itsWindowManager->initialize(opts.windowDrag);
-    }
-
-    void Style::borderSizesChanged()
-    {
-#if !defined QTC_QT_ONLY
-        int old = qtcGetWindowBorderSize().titleHeight;
-
-        if (old != qtcGetWindowBorderSize(true).titleHeight) {
-            QWidgetList                tlw = QApplication::topLevelWidgets();
-            QWidgetList::ConstIterator it(tlw.begin()),
-                        end(tlw.end());
-
-            for (; it != end; ++it)
-                if (qobject_cast<QMainWindow *>(*it) && static_cast<QMainWindow *>(*it)->menuBar())
-                    static_cast<QMainWindow *>(*it)->menuBar()->update();
-        }
-#endif
     }
 }

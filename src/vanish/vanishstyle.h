@@ -21,6 +21,7 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <QCommonStyle>
 #include <QProgressBar>
 #include <QTime>
 #include <QPalette>
@@ -32,22 +33,11 @@
 #include <QStyleOption>
 #include <QBitmap>
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-#include <QFormLayout>
+#  include <QFormLayout>
 #endif
+
 typedef qulonglong QtcKey;
 #include "common.h"
-
-#if !defined QTC_QT_ONLY
-#include <KDE/KComponentData>
-#endif
-
-// #ifdef QTC_KSTYLE
-// #include <kstyle.h>
-// #define BASE_STYLE KStyle
-// #else
-#include <QCommonStyle>
-#define BASE_STYLE QCommonStyle
-// #endif
 
 class QStyleOptionSlider;
 class QLabel;
@@ -68,9 +58,7 @@ namespace Vanish
     {
         Q_OBJECT
         Q_CLASSINFO("X-KDE-CustomElements", "true")
-
     public:
-
         enum BackgroundType {
             BGND_WINDOW,
             BGND_DIALOG,
@@ -277,19 +265,8 @@ namespace Vanish
                                                    Qt::Orientation orientation, const QStyleOption *option,
                                                    const QWidget *widget) const;
         void           kdeGlobalSettingsChange(int type, int);
-        void           borderSizesChanged();
 
     private:
-#if !defined QTC_QT_ONLY
-        void           setupKde4();
-
-
-        void           setDecorationColors();
-        void           applyKdeSettings(bool pal);
-#endif
-
-    private:
-
         mutable Options                    opts;
         QColor                             itsHighlightCols[TOTAL_SHADES + 1],
                                            itsBackgroundCols[TOTAL_SHADES + 1],
@@ -340,9 +317,6 @@ namespace Vanish
         QWidget                            *itsHoverWidget;
         mutable QScrollBar                 *itsSViewSBar;
         mutable QMap<QWidget *, QSet<QWidget *> > itsSViewContainers;
-#if !defined QTC_QT_ONLY
-        KComponentData                     itsComponentData;
-#endif
         Vanish::WindowManager             *itsWindowManager;
         Vanish::BlurHelper                *itsBlurHelper;
         Vanish::ShortcutHandler           *itsShortcutHandler;

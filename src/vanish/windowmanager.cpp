@@ -59,10 +59,6 @@
 #include <QtCore/QTextStream>
 #include <QtGui/QTextDocument>
 
-#ifndef QTC_QT_ONLY
-#include <KGlobalSettings>
-#endif
-
 namespace Vanish
 {
 
@@ -116,9 +112,6 @@ namespace Vanish
         setEnabled(windowDrag);
         setDragMode(windowDrag);
 
-#ifndef QTC_QT_ONLY
-        setDragDistance(KGlobalSettings::dndEventDelay());
-#endif
         setDragDelay(QApplication::startDragTime());
 
         initializeWhiteList(whiteList);
