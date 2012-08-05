@@ -1,4 +1,4 @@
-project(WidgetFactory)
+project(WidgetStyles)
 
 cmake_minimum_required(VERSION 2.8.7)
 
@@ -37,5 +37,11 @@ endif()
 find_package(Qt5Widgets REQUIRED)
 if(NOT Qt5Widgets_FOUND)
     message(FATAL_ERROR "Qt5Widgets module is required!")
+endif()
+find_package(Qt5PrintSupport REQUIRED)
+if(NOT Qt5PrintSupport_FOUND)
+    message(FATAL_ERROR "Qt5PrintSupport module is required!")
+endif()
+
 # Subdirectories
 add_subdirectory(src)
