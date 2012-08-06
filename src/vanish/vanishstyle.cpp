@@ -34,7 +34,7 @@
 #define MAX_ROUND_BTN_PAD (ROUND_MAX==opts.round ? 3 : 0)
 
 // TODO! REMOVE THIS WHEN KDE'S ICON SETTINGS ACTUALLY WORK!!!
-#define FIX_DISABLED_ICONS
+//#define FIX_DISABLED_ICONS
 
 #define MO_ARROW_X(MO, COL) (state&State_Enabled \
                              ? (MO_NONE!=opts.coloredMouseOver && (MO) \
@@ -45,28 +45,11 @@
 
 namespace Vanish
 {
-
-#if defined FIX_DISABLED_ICONS && !defined QTC_QT_ONLY
-    QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State)
-    {
-        QPixmap pix = icon.pixmap(size, QIcon::Normal);
-
-        if (QIcon::Disabled == mode) {
-            QImage img = pix.toImage();
-            KIconEffect::toGray(img, 1.0);
-            KIconEffect::semiTransparent(img);
-            pix = QPixmap::fromImage(img);
-        }
-
-        return pix;
-    }
-
-#else
     inline QPixmap getIconPixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state = QIcon::Off)
     {
         return icon.pixmap(size, mode, state);
     }
-#endif
+
     inline QPixmap getIconPixmap(const QIcon &icon, int size, QIcon::Mode mode, QIcon::State state = QIcon::Off)
     {
         return getIconPixmap(icon, QSize(size, size), mode, state);
@@ -754,7 +737,7 @@ namespace Vanish
                 opts.bgndOpacity = opts.dlgOpacity = opts.menuBgndOpacity = 100;
         } else {
             qtcReadConfig(itsName.isEmpty() ? ":/themes/Default.vanish" : itsName, &opts);
-	}
+        }
 
         opts.contrast = QSettings(QLatin1String("Trolltech")).value("/Qt/KDE/contrast", DEFAULT_CONTRAST).toInt();
         if (opts.contrast < 0 || opts.contrast > 10)
@@ -2806,9 +2789,9 @@ namespace Vanish
 #if !defined QTC_QT_ONLY
             case SH_DialogButtonBox_ButtonsHaveIcons:
                 return KGlobalSettings::showIconsOnPushButtons();
-            case SH_ItemView_ActivateItemOnSingleClick:
-                return KGlobalSettings::singleClick();
 #endif
+            case SH_ItemView_ActivateItemOnSingleClick:
+                return false;
             default:
 #if !defined QTC_QT_ONLY
                 // Tell the calling app that we can handle certain custom widgets...
@@ -2825,10 +2808,66 @@ namespace Vanish
 
     QPalette Style::standardPalette() const
     {
-#if defined QTC_QT_ONLY
+#if 0
         return QCommonStyle::standardPalette();
 #else
-        return KGlobalSettings::createApplicationPalette(KSharedConfig::openConfig(itsComponentData));
+        QPalette palette;
+
+        palette.setBrush(QPalette::Active, QPalette::Window, QColor(QRgb(0xffdadada)));
+        palette.setBrush(QPalette::Active, QPalette::WindowText, QColor(QRgb(0xff2e3436)));
+        palette.setBrush(QPalette::Active, QPalette::Button, QColor(QRgb(0xffededed)));
+        palette.setBrush(QPalette::Active, QPalette::Light, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Active, QPalette::Midlight, QColor(QRgb(0xffdadada)));
+        palette.setBrush(QPalette::Active, QPalette::Dark, QColor(QRgb(0xfa0a0a0)));
+        palette.setBrush(QPalette::Active, QPalette::Mid, QColor(QRgb(0xfff7f7f7)));
+        palette.setBrush(QPalette::Active, QPalette::Text, QColor(QRgb(0xff2e3436)));
+        palette.setBrush(QPalette::Active, QPalette::BrightText, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Active, QPalette::ButtonText, QColor(QRgb(0xff000000)));
+        palette.setBrush(QPalette::Active, QPalette::Base, QColor(QRgb(0xfffffafa)));
+        palette.setBrush(QPalette::Active, QPalette::AlternateBase, palette.color(QPalette::Active, QPalette::Base).darker(110));
+        palette.setBrush(QPalette::Active, QPalette::Shadow, QColor(QRgb(0xff828282)));
+        palette.setBrush(QPalette::Active, QPalette::Highlight, QColor(QRgb(0xff117ad8)));
+        palette.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Active, QPalette::Link, QColor(QRgb(0xff4a90d9)));
+        palette.setBrush(QPalette::Active, QPalette::LinkVisited, QColor(QRgb(0xff52188b)));
+
+        palette.setBrush(QPalette::Inactive, QPalette::Window, palette.window());
+        palette.setBrush(QPalette::Inactive, QPalette::WindowText, palette.windowText());
+        palette.setBrush(QPalette::Inactive, QPalette::Button, palette.button());
+        palette.setBrush(QPalette::Inactive, QPalette::Light, palette.light());
+        palette.setBrush(QPalette::Inactive, QPalette::Midlight, palette.midlight());
+        palette.setBrush(QPalette::Inactive, QPalette::Dark, palette.dark());
+        palette.setBrush(QPalette::Inactive, QPalette::Mid, palette.mid());
+        palette.setBrush(QPalette::Inactive, QPalette::Text, palette.text());
+        palette.setBrush(QPalette::Inactive, QPalette::BrightText, palette.brightText());
+        palette.setBrush(QPalette::Inactive, QPalette::ButtonText, palette.buttonText());
+        palette.setBrush(QPalette::Inactive, QPalette::Base, palette.base());
+        palette.setBrush(QPalette::Inactive, QPalette::AlternateBase, palette.alternateBase());
+        palette.setBrush(QPalette::Inactive, QPalette::Shadow, palette.shadow());
+        palette.setBrush(QPalette::Inactive, QPalette::Highlight, palette.highlight());
+        palette.setBrush(QPalette::Inactive, QPalette::HighlightedText, palette.highlightedText());
+        palette.setBrush(QPalette::Inactive, QPalette::Link, palette.link());
+        palette.setBrush(QPalette::Inactive, QPalette::LinkVisited, palette.linkVisited());
+
+        palette.setBrush(QPalette::Disabled, QPalette::Window, QColor(QRgb(0xfff1f0ef)));
+        palette.setBrush(QPalette::Disabled, QPalette::WindowText, QColor(QRgb(0xffa7aba7)));
+        palette.setBrush(QPalette::Disabled, QPalette::Button, QColor(QRgb(0xffdddfe4)));
+        palette.setBrush(QPalette::Disabled, QPalette::Light, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Disabled, QPalette::Midlight, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Disabled, QPalette::Dark, QColor(QRgb(0xff555555)));
+        palette.setBrush(QPalette::Disabled, QPalette::Mid, QColor(QRgb(0xffc7c7c7)));
+        palette.setBrush(QPalette::Disabled, QPalette::Text, QColor(QRgb(0xffc7c7c7)));
+        palette.setBrush(QPalette::Disabled, QPalette::BrightText, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Disabled, QPalette::ButtonText, QColor(QRgb(0xff808080)));
+        palette.setBrush(QPalette::Disabled, QPalette::Base, QColor(QRgb(0xffefefef)));
+        palette.setBrush(QPalette::Disabled, QPalette::AlternateBase, palette.color(QPalette::Disabled, QPalette::Base).darker(110));
+        palette.setBrush(QPalette::Disabled, QPalette::Shadow, QColor(QRgb(0xff000000)));
+        palette.setBrush(QPalette::Disabled, QPalette::Highlight, QColor(QRgb(0xff567594)));
+        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, QColor(QRgb(0xffffffff)));
+        palette.setBrush(QPalette::Disabled, QPalette::Link, QColor(QRgb(0xff0000ee)));
+        palette.setBrush(QPalette::Disabled, QPalette::LinkVisited, QColor(QRgb(0xff52188b)));
+
+        return palette;
 #endif
     }
 
@@ -2898,7 +2937,7 @@ namespace Vanish
                 return QIcon::fromTheme("application-x-zerosize");
                 //         case SP_FileLinkIcon:
             case SP_FileDialogStart:
-                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-edn" : "go-first");
+                return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-end" : "go-first");
             case SP_FileDialogEnd:
                 return QIcon::fromTheme(Qt::RightToLeft == QApplication::layoutDirection() ? "go-first" : "go-end");
             case SP_FileDialogToParent:
@@ -10134,9 +10173,9 @@ namespace Vanish
                             p->setPen(/*WIDGET_SCROLLVIEW==w && !hasFocus
 ? checkColour(option, QPalette::Window)
 : WIDGET_ENTRY==w && !hasFocus
-    ? checkColour(option, QPalette::Base)
-    : */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
-                                                        WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
+? checkColour(option, QPalette::Base)
+: */enabled && (BORDER_SUNKEN == borderProfile || hasFocus || /*APPEARANCE_FLAT!=app ||*/
+                                                WIDGET_TAB_TOP == w || WIDGET_TAB_BOT == w)
                                 ? br
                                 : checkColour(option, QPalette::Window));
                         p->drawPath(botPath);
