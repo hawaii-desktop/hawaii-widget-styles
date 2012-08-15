@@ -18,15 +18,19 @@
   Boston, MA 02110-1301, USA.
 */
 
+#include <iostream>
+
 #include <QtWidgets>
 #include <QtPrintSupport/QPrintDialog>
+
 #include "vanishstyle.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
 #include "shortcuthandler.h"
 #include "pixmaps.h"
-#include <iostream>
 #include "config_file.h"
+
+#define DIAL_DOT_ON_RING
 
 // WebKit seems to just use the values from ::pixelMetric to get button sizes. So, in pixelMetric we add some extra padding to PM_ButtonMargin
 // if we're max rounding - this gives a nicer border. However, dont want this on real buttons - so in sizeFromContents we remove this padding
@@ -467,24 +471,6 @@ namespace Vanish
         if (3 == rgb.size())
             *col = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
     }
-
-#if defined QTC_STYLE_SUPPORT || defined QTC_QT_ONLY
-    static QString kdeHome()
-    {
-        static QString kdeHomePath;
-        if (kdeHomePath.isEmpty()) {
-            kdeHomePath = QString::fromLocal8Bit(qgetenv("KDEHOME"));
-            if (kdeHomePath.isEmpty()) {
-                QDir    homeDir(QDir::homePath());
-                QString kdeConfDir(QLatin1String("/.kde"));
-                if (homeDir.exists(QLatin1String(".kde4")))
-                    kdeConfDir = QLatin1String("/.kde4");
-                kdeHomePath = QDir::homePath() + kdeConfDir;
-            }
-        }
-        return kdeHomePath;
-    }
-#endif
 
     class VanishDockWidgetTitleBar : public QWidget
     {
@@ -2425,13 +2411,9 @@ namespace Vanish
             case PM_IconViewIconSize:
             case PM_LargeIconSize:
                 return 32;
-#if QT_VERSION >= 0x040500
             case PM_SubMenuOverlap:
                 return -2;
             case PM_ScrollView_ScrollBarSpacing:
-#else
-            case PM_TextCursorWidth+3:
-#endif
                 return opts.etchEntry ? 2 : 3;
             case PM_MenuPanelWidth:
                 return opts.popupBorder ? pixelMetric(PM_DefaultFrameWidth, option, widget) : 0;
@@ -2442,16 +2424,12 @@ namespace Vanish
             case PM_HeaderMargin:
                 return 3;
             case PM_DefaultChildMargin:
-                return isOOWidget(widget)
-                       ? /*opts.round>=ROUND_FULL && !(opts.square&SQUARE_SCROLLVIEW)
-                        ?*/ 2
-                       /*: 1*/
-                       : 6;
+                return isOOWidget(widget) ? 2 : 6;
             case PM_DefaultTopLevelMargin:
                 return 9;
             case PM_LayoutHorizontalSpacing:
             case PM_LayoutVerticalSpacing:
-                return -1; // use layoutSpacingImplementation
+                return -1; // TODO: use layoutSpacingImplementation
             case PM_DefaultLayoutSpacing:
                 return 6;
             case PM_LayoutLeftMargin:
@@ -2468,8 +2446,7 @@ namespace Vanish
             case PM_ToolBarItemSpacing:
                 return TBTN_JOINED == opts.tbarBtns ? 0 : 1;
             case PM_ToolBarFrameWidth:
-                // Remove because, in KDE4 at least, if have two locked toolbars together then the last/first items are too close
-                return /*TB_NONE==opts.toolbarBorders ? 0 : */1;
+                return 1;
             case PM_FocusFrameVMargin:
             case PM_FocusFrameHMargin:
                 return 2;
@@ -2775,21 +2752,17 @@ namespace Vanish
                         return !cmb->editable;
                 }
                 return 0;
-#if QT_VERSION >= 0x040400
             case SH_FormLayoutFormAlignment:
-                return Qt::AlignLeft | Qt::AlignTop; // KDE4 HIG, align the contents in a form layout to the left
+                return Qt::AlignLeft | Qt::AlignTop;
             case SH_FormLayoutLabelAlignment:
-                return Qt::AlignRight; // KDE4  HIG, align the labels in a form layout to the right
+                return Qt::AlignRight;
             case SH_FormLayoutFieldGrowthPolicy:
                 return QFormLayout::ExpandingFieldsGrow;
             case SH_FormLayoutWrapPolicy:
                 return QFormLayout::DontWrapRows;
-#endif
                 // TODO: From settings
-#if !defined QTC_QT_ONLY
             case SH_DialogButtonBox_ButtonsHaveIcons:
-                return KGlobalSettings::showIconsOnPushButtons();
-#endif
+                return false;
             case SH_ItemView_ActivateItemOnSingleClick:
                 return false;
             default:
@@ -11302,6 +11275,7 @@ namespace Vanish
 
     const QColor *Style::getMdiColors(const QStyleOption *option, bool active) const
     {
+#ifdef PORT_DONE
         if (!itsActiveMdiColors) {
             itsActiveMdiTextColor = option ? option->palette.text().color() : QApplication::palette().text().color();
             itsMdiTextColor = option ? option->palette.text().color() : QApplication::palette().text().color();
@@ -11356,6 +11330,7 @@ namespace Vanish
         }
 
         return active ? itsActiveMdiColors : itsMdiColors;
+#endif
     }
 
     void Style::readMdiPositions() const

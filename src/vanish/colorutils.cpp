@@ -44,45 +44,17 @@ static int isnan(double x)
 }
 #endif
 
-#ifdef __cplusplus
 static inline int qtcLimit(double c)
 {
     return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
 }
-#else
-static inline int qtcLimit(double c)
-{
-    return c < 0.0
-           ? 0
-           : c > 65535.0
-           ? 65535
-           : (int)c;
-}
-#endif
 
-#ifdef __cplusplus
 #if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define FLOAT_COLOR(VAL, COL) (VAL).COL##F()
 #define TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
 #else
 #define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
 #define TO_COLOR(R, G, B) QColor(qtcLimit(R*255.0), qtcLimit(G*255.0), qtcLimit(B*255.0))
-#endif
-#else
-#define inline
-#define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL*1.0)/65535.0))
-static GdkColor qtcGdkColor(double r, double g, double b)
-{
-    GdkColor col;
-
-    col.red = qtcLimit(r * 65535);
-    col.green = qtcLimit(g * 65535);
-    col.blue = qtcLimit(b * 65535);
-
-    return col;
-}
-
-#define TO_COLOR(R, G, B) qtcGdkColor(R, G, B)
 #endif
 
 static inline double ColorUtils_normalize(double a)

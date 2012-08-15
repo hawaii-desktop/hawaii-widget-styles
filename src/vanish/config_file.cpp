@@ -609,7 +609,6 @@ const char *qtcGetHome()
 
 #ifdef __cplusplus
 
-#if defined QTC_QT_ONLY || QT_VERSION < 0x040000
 #if QT_VERSION < 0x040000
 #include <qdir.h>
 #include <qfile.h>
@@ -667,10 +666,6 @@ static bool makeDir(const QString &dir, int mode)
     return true;
 #endif
 }
-
-#else
-#include <kstandarddirs.h>
-#endif
 #endif
 
 const char *qtcConfDir()
