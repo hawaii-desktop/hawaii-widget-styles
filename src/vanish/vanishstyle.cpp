@@ -1471,7 +1471,6 @@ namespace Vanish
 
             widget->setAttribute(Qt::WA_Hover, true);
 
-            //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             Utils::addEventFilter(widget, this);
 
             setMenuTextColors(widget, true);
@@ -1546,7 +1545,6 @@ namespace Vanish
                 // kill ugly frames...
                 if (QFrame::Box == frame->frameShape() || QFrame::Panel == frame->frameShape() || QFrame::WinPanel == frame->frameShape())
                     frame->setFrameShape(QFrame::StyledPanel);
-                //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 Utils::addEventFilter(widget, this);
 
                 if (widget->parent() && widget->parent()->inherits("VTitleWidget")) {
@@ -8136,6 +8134,7 @@ namespace Vanish
     QRect Style::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
     {
         QRect rect;
+
         switch (element) {
             case SE_SliderFocusRect:
             case SE_ToolBoxTabContents:
@@ -11116,6 +11115,7 @@ namespace Vanish
 
     void Style::setMenuTextColors(QWidget *widget, bool isMenuBar) const
     {
+#ifdef PORT_DONE
         if (SHADE_WINDOW_BORDER == opts.shadeMenubars) {
             QPalette pal(widget->palette());
             QStyleOption opt;
@@ -11157,6 +11157,7 @@ namespace Vanish
             }
             widget->setPalette(pal);
         }
+#endif
     }
 
     const QColor *Style::menuColors(const QStyleOption *option, bool active) const
