@@ -351,7 +351,7 @@ namespace Vanish
         while (w && --level > 0) {
             if (qobject_cast<const QAbstractItemView *>(w))
                 return true;
-            if (qobject_cast<const QDialog *>(w)/* || qobject_cast<const QMainWindow *>(w)*/)
+            if (qobject_cast<const QDialog *>(w))
                 return false;
             w = w->parent();
         }
@@ -483,9 +483,8 @@ namespace Vanish
     class VanishDockWidgetTitleBar : public QWidget
     {
     public:
-
-        VanishDockWidgetTitleBar(QWidget *parent) : QWidget(parent) { }
-        virtual ~VanishDockWidgetTitleBar() { }
+        VanishDockWidgetTitleBar(QWidget *parent) : QWidget(parent) {}
+        virtual ~VanishDockWidgetTitleBar() {}
         QSize sizeHint() const {
             return QSize(0, 0);
         }
@@ -494,17 +493,14 @@ namespace Vanish
     inline int numButtons(EScrollbar type)
     {
         switch (type) {
-            default:
-            case SCROLLBAR_KDE:
-                return 3;
-                break;
             case SCROLLBAR_WINDOWS:
             case SCROLLBAR_PLATINUM:
             case SCROLLBAR_NEXT:
                 return 2;
-                break;
             case SCROLLBAR_NONE:
                 return 0;
+            default:
+                return 3;
         }
     }
 
@@ -1294,14 +1290,6 @@ namespace Vanish
 
         bool enableMouseOver(opts.highlightFactor || opts.coloredMouseOver);
 
-        /*
-        {
-            for(QWidget *w=widget; w; w=w->parentWidget())
-                printf("%s ", w->metaObject()->className());
-            printf("\n");
-        }
-        */
-
         // 'Fix' konqueror's large menubar...
         if (APP_KONQUEROR == theThemedApp && widget->parentWidget() && qobject_cast<QToolButton *>(widget) && qobject_cast<QMenuBar *>(widget->parentWidget()))
             widget->parentWidget()->setMaximumSize(32768, konqMenuBarSize((QMenuBar *)widget->parentWidget()));
@@ -1406,13 +1394,12 @@ namespace Vanish
 
             if (opts.forceAlternateLvCols &&
                     viewport->autoFillBackground() && // Dolphins Folders panel
-                    //255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
                     !widget->inherits("VFilePlacesView") &&
                     // Exclude non-editable combo popup...
                     !(opts.gtkComboMenus && widget->inherits("QComboBoxListView") && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                       qobject_cast<QComboBox *>(widget->parentWidget()->parentWidget()) &&
                       !static_cast<QComboBox *>(widget->parentWidget()->parentWidget())->isEditable()) &&
-                    // Exclude KAboutDialog...
+                    // Exclude VAboutDialog...
                     !parentIs(widget, 5, "VAboutDialog") &&
                     (qobject_cast<QTreeView *>(widget) || (qobject_cast<QListView *>(widget) && QListView::IconMode != ((QListView *)widget)->viewMode())))
                 itemView->setAlternatingRowColors(true);
@@ -1483,7 +1470,7 @@ namespace Vanish
                )
                 ((QLabel *)widget)->setTextInteractionFlags(((QLabel *)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
 
-        } else if (/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget)) {
+        } else if (qobject_cast<QAbstractScrollArea *>(widget)) {
             if (CUSTOM_BGND)
                 polishScrollArea(static_cast<QAbstractScrollArea *>(widget));
             if (!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth() > 0))
@@ -1516,12 +1503,11 @@ namespace Vanish
                    widget->parentWidget()->parentWidget() &&
                    widget->parentWidget()->parentWidget()->parentWidget() &&
                    qobject_cast<QSplitter *>(widget->parentWidget()) &&
-                   widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
-            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/)
+                   widget->parentWidget()->parentWidget()->inherits("KFileWidget"))
             ((QDockWidget *)widget)->setTitleBarWidget(new VanishDockWidgetTitleBar(widget));
 #ifdef QTC_ENABLE_PARENTLESS_DIALOG_FIX_SUPPORT
         else if (opts.fixParentlessDialogs && qobject_cast<QDialog *>(widget) && widget->windowFlags()&Qt::WindowType_Mask &&
-                 (!widget->parentWidget()) /*|| widget->parentWidget()->isHidden())*/) {
+                 (!widget->parentWidget())) {
             QWidget *activeWindow = getActiveWindow(widget);
 
             if (activeWindow) {
@@ -1652,7 +1638,7 @@ namespace Vanish
             ((QFrame *)widget)->setFrameShape(QFrame::NoFrame);
 
         if (QLayout *layout = widget->layout()) {
-            // explicitely check public layout classes, QMainWindowLayout doesn't work here
+            // Explicitely check public layout classes, QMainWindowLayout doesn't work here
             if (qobject_cast<QBoxLayout *>(layout)
                     || qobject_cast<QFormLayout *>(layout)
                     || qobject_cast<QGridLayout *>(layout)
@@ -1729,13 +1715,11 @@ namespace Vanish
                 continue;
 
             int fieldHeight = fieldItem->sizeHint().height();
-            /* for large fields, we don't center */
+            // For large fields, we don't center
             if (fieldHeight <= 2 * fontHeight(0, label) + addedHeight) {
                 if (fieldHeight > labelHeight)
                     labelHeight = fieldHeight;
             }
-            //         else if (verticalTextShift(label->fontMetrics()) & 1)
-            //                 labelHeight += 1;
             if (qobject_cast<QCheckBox *>(label))
                 label->setMinimumHeight(labelHeight);
             else
@@ -1868,7 +1852,6 @@ namespace Vanish
             if (CUSTOM_BGND)
                 widget->setBackgroundRole(QPalette::Background);
 
-            //         if(opts.shadeMenubarOnlyWhenActive && SHADE_NONE!=opts.shadeMenubars)
             widget->removeEventFilter(this);
 
             if (SHADE_WINDOW_BORDER == opts.shadeMenubars || opts.customMenuTextColor || SHADE_BLEND_SELECTED == opts.shadeMenubars ||
@@ -1876,7 +1859,7 @@ namespace Vanish
                 widget->setPalette(QApplication::palette());
         } else if (qobject_cast<QLabel *>(widget))
             widget->removeEventFilter(this);
-        else if (/*!opts.gtkScrollViews && */qobject_cast<QAbstractScrollArea *>(widget)) {
+        else if (qobject_cast<QAbstractScrollArea *>(widget)) {
             if (!opts.gtkScrollViews && (((QFrame *)widget)->frameWidth() > 0))
                 widget->removeEventFilter(this);
             if (APP_KONTACT == theThemedApp && widget->parentWidget()) {
@@ -1900,8 +1883,7 @@ namespace Vanish
                    widget->parentWidget()->parentWidget() &&
                    widget->parentWidget()->parentWidget()->parentWidget() &&
                    qobject_cast<QSplitter *>(widget->parentWidget()) &&
-                   widget->parentWidget()->parentWidget()->inherits("KFileWidget") /*&&
-            widget->parentWidget()->parentWidget()->parentWidget()->inherits("KFileDialog")*/) {
+                   widget->parentWidget()->parentWidget()->inherits("KFileWidget")) {
             delete((QDockWidget *)widget)->titleBarWidget();
             ((QDockWidget *)widget)->setTitleBarWidget(0L);
         }
@@ -2092,7 +2074,8 @@ namespace Vanish
         switch ((int)(event->type())) {
             case QEvent::Timer:
             case QEvent::Move:
-                return false; // just for performance - they can occur really often
+                // Just for performance - they can occur really often
+                return false;
             case QEvent::Resize:
                 if (!(opts.square & SQUARE_POPUP_MENUS) && object->inherits("QComboBoxPrivateContainer")) {
                     QWidget *widget = static_cast<QWidget *>(object);
@@ -2118,10 +2101,9 @@ namespace Vanish
                     }
                 }
 
-                //bool isCombo=false;
                 if ((!IS_FLAT_BGND(opts.menuBgndAppearance) || IMG_NONE != opts.menuBgndImage.type || 100 != opts.menuBgndOpacity ||
                         !(opts.square & SQUARE_POPUP_MENUS)) &&
-                        (qobject_cast<QMenu *>(object) || (/*isCombo=*/object->inherits("QComboBoxPrivateContainer")))) {
+                        (qobject_cast<QMenu *>(object) || (object->inherits("QComboBoxPrivateContainer")))) {
                     QWidget      *widget = qobject_cast<QWidget *>(object);
                     QPainter     p(widget);
                     QRect        r(widget->rect());
@@ -3025,7 +3007,7 @@ namespace Vanish
                 if (state & State_Children) {
                     QRect ar(r.x() + ((r.width() - (LV_SIZE + 4)) >> 1), r.y() + ((r.height() - (LV_SIZE + 4)) >> 1), LV_SIZE + 4,
                              LV_SIZE + 4);
-                    if (/*LV_OLD==*/opts.lvLines) {
+                    if (opts.lvLines) {
                         beforeV = ar.y() - 1;
                         afterH = ar.x() + LV_SIZE + 4;
                         afterV = ar.y() + LV_SIZE + 4;
@@ -3063,12 +3045,12 @@ namespace Vanish
                               : PE_IndicatorArrowRight, MO_ARROW(QPalette::ButtonText));
                 }
 
-                const int constStep =/*LV_OLD==*/opts.lvLines
-                                                 ? 0
-                                                 : widget && qobject_cast<const QTreeView *>(widget)
-                                                 ? ((QTreeView *)widget)->indentation() : 20;
+                const int constStep = opts.lvLines
+                                      ? 0
+                                      : widget && qobject_cast<const QTreeView *>(widget)
+                                      ? ((QTreeView *)widget)->indentation() : 20;
 
-                if (opts.lvLines /*&& (LV_OLD==opts.lvLines || (r.x()>=constStep && constStep>0))*/) {
+                if (opts.lvLines) {
                     painter->setPen(palette.mid().color());
                     if (state & State_Item) {
                         if (reverse)
@@ -3088,7 +3070,7 @@ namespace Vanish
                     }
                     if (state & State_Sibling && afterV < r.bottom())
                         painter->drawLine(middleH - constStep, afterV, middleH - constStep, r.bottom());
-                    if (state & (State_Open | State_Children | State_Item | State_Sibling) && (/*LV_NEW==opts.lvLines || */beforeV > r.y()))
+                    if (state & (State_Open | State_Children | State_Item | State_Sibling) && (beforeV > r.y()))
                         painter->drawLine(middleH - constStep, r.y(), middleH - constStep, beforeV);
                 }
                 painter->restore();
@@ -3250,7 +3232,7 @@ namespace Vanish
 
                             if (FRAME_SHADED == opts.groupBox)
                                 drawBorder(painter, r, option, round, backgroundColors(option), WIDGET_FRAME,
-                                           /*state&State_Raised && opts.gbFactor<0 ? BORDER_RAISED : */BORDER_SUNKEN);
+                                           BORDER_SUNKEN);
                             else {
                                 QColor          col(backgroundColors(option)[STD_BORDER]);
                                 QLinearGradient grad(r.topLeft(), r.bottomLeft());
@@ -3372,8 +3354,7 @@ namespace Vanish
                                 opt.state &= ~State_HasFocus;
 
                             if (opts.round && IS_FLAT_BGND(opts.bgndAppearance) && 100 == opts.bgndOpacity &&
-                                    widget && widget->parentWidget() && !inQAbstractItemView/* &&
-   widget->palette().background().color()!=widget->parentWidget()->palette().background().color()*/) {
+                                    widget && widget->parentWidget() && !inQAbstractItemView) {
                                 painter->setPen(widget->parentWidget()->palette().background().color());
                                 painter->drawRect(r);
                                 painter->drawRect(r.adjusted(1, 1, -1, -1));
@@ -3579,7 +3560,7 @@ namespace Vanish
 
                         if (DO_EFFECT && opts.etchEntry && APP_ARORA == theThemedApp && widget &&
                                 widget->parentWidget() && 0 == strcmp(widget->metaObject()->className(), "LocationBar")) {
-                            const QToolBar *tb = getToolBar(widget->parentWidget()/*, false*/);
+                            const QToolBar *tb = getToolBar(widget->parentWidget());
 
                             if (tb) {
                                 QRect r2(r);
@@ -3944,7 +3925,7 @@ namespace Vanish
 
                             if (ROUNDED) {
                                 bool square((opts.square & SQUARE_LISTVIEW_SELECTION) &&
-                                            (( /*(!widget && r.height()<=40 && r.width()>=48) || */
+                                            ((
                                                  (widget && !widget->inherits("VFilePlacesView") &&
                                                   (qobject_cast<const QTreeView *>(widget) ||
                                                    (qobject_cast<const QListView *>(widget) &&
@@ -4180,7 +4161,7 @@ namespace Vanish
                 painter->save();
 
                 if (const QStyleOptionTabWidgetFrame *twf = qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
-                    if ((opts.round || (/*CUSTOM_BGND && */0 == opts.tabBgnd)) &&
+                    if ((opts.round || (0 == opts.tabBgnd)) &&
                             widget && ::qobject_cast<const QTabWidget *>(widget)) {
                         struct QtcTabWidget : public QTabWidget {
                             bool  tabsVisible()    const {
@@ -4194,7 +4175,7 @@ namespace Vanish
                         const QTabWidget *tw((const QTabWidget *)widget);
 
                         if (tw->count() > 0 && ((const QtcTabWidget *)widget)->tabsVisible()) {
-                            if (!reverse && /*CUSTOM_BGND && */0 == opts.tabBgnd) { // Does not work for reverse :-(
+                            if (!reverse && 0 == opts.tabBgnd) { // Does not work for reverse :-(
                                 QRect tabRect(((const QtcTabWidget *)widget)->currentTabRect());
                                 int   adjust(TAB_MO_GLOW == opts.tabMouseOver && !(opts.thin & THIN_FRAMES) ? 2 : 1);
 
@@ -4303,7 +4284,7 @@ namespace Vanish
                                  ? v4Opt->backgroundBrush.color()
                                  : palette.color(cg, QPalette::Highlight));
                     bool   square((opts.square & SQUARE_LISTVIEW_SELECTION) &&
-                                  (/*(!widget && r.height()<=40 && r.width()>=48) || */
+                                  (
                                       (widget && !widget->inherits("VFilePlacesView") &&
                                        (qobject_cast<const QTreeView *>(widget) ||
                                         (qobject_cast<const QListView *>(widget) &&
@@ -4544,7 +4525,7 @@ namespace Vanish
                 bool         horiz(state & State_Horizontal || (r.height() > 6 && r.height() > r.width()));
 
                 painter->save();
-                if (/*IS_FLAT_BGND(opts.bgndAppearance) || */state & State_MouseOver && state & State_Enabled) {
+                if (state & State_MouseOver && state & State_Enabled) {
                     QColor color(palette.color(QPalette::Active, QPalette::Window));
 
                     if (state & State_MouseOver && state & State_Enabled && opts.splitterHighlight)
@@ -4626,10 +4607,8 @@ namespace Vanish
                                                     Qt::BottomToolBarArea == toolbar->toolBarArea ||
                                                     Qt::TopToolBarArea == toolbar->toolBarArea);
                         if (TB_NONE != opts.toolbarBorders) {
-                            const QColor *use =/*PE_PanelMenuBar==pe && itsActive
-                                            ? itsMenubarCols
-                                            : */ backgroundColors(option);
-                            bool         dark(TB_DARK == opts.toolbarBorders || TB_DARK_ALL == opts.toolbarBorders);
+                            const QColor *use = backgroundColors(option);
+                            bool dark(TB_DARK == opts.toolbarBorders || TB_DARK_ALL == opts.toolbarBorders);
 
                             if (TB_DARK_ALL == opts.toolbarBorders || TB_LIGHT_ALL == opts.toolbarBorders) {
                                 painter->setPen(use[0]);
@@ -4824,7 +4803,7 @@ namespace Vanish
                     painter->save();
 
                     if (state & (State_Raised | State_Sunken)) {
-                        bool         sunken(state & (/*State_Down |*/ /*State_On | */State_Sunken));
+                        bool sunken(state & State_Sunken);
                         QStyleOption opt(*option);
 
                         opt.state &= ~State_On;
@@ -5205,7 +5184,7 @@ namespace Vanish
                                           false, false, opts.menuStripeAppearance, WIDGET_OTHER);
 
                     if (selected && enabled)
-                        drawMenuItem(painter, r, option, /*comboMenu ? MENU_COMBO : */MENU_POPUP, ROUNDED_ALL,
+                        drawMenuItem(painter, r, option, MENU_POPUP, ROUNDED_ALL,
                                      opts.useHighlightForMenu ? (itsOOMenuCols ? itsOOMenuCols : itsHighlightCols) : use);
 
                     if (comboMenu) {
@@ -5938,7 +5917,7 @@ namespace Vanish
                                 }
                             } else {
                                 int t(firstTab ? r2.top() + (opts.round > ROUND_SLIGHT && !(opts.square & SQUARE_TAB_FRAME) ? 2 : 1) : r2.top() - 1),
-                                    b(/*lastTab ? r2.bottom()-2 : */ r2.bottom() + 1);
+                                    b(r2.bottom() + 1);
 
                                 painter->setPen(use[STD_BORDER]);
                                 painter->drawLine(r2.right() - 1, t, r2.right() - 1, b);
@@ -6007,7 +5986,7 @@ namespace Vanish
                                 }
                             } else {
                                 int t(firstTab ? r2.top() + (opts.round > ROUND_SLIGHT && !(opts.square & SQUARE_TAB_FRAME) ? 2 : 1) : r2.top() - 1),
-                                    b(/*lastTab ? r2.bottom()-2 : */ r2.bottom() + 1);
+                                    b(r2.bottom() + 1);
 
                                 painter->setPen(use[STD_BORDER]);
                                 painter->drawLine(r2.left() + 1, t, r2.left() + 1, b);
@@ -6111,7 +6090,7 @@ namespace Vanish
                 }
 
                 painter->save();
-                if (opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance) /*&& SCROLLBAR_NONE!=opts.scrollbarType*/)
+                if (opts.flatSbarButtons && !IS_FLAT(opts.sbarBgndAppearance))
                     drawBevelGradientReal(palette.brush(QPalette::Background).color(), painter, r, state & State_Horizontal, false,
                                           opts.sbarBgndAppearance, WIDGET_SB_BGND);
 
@@ -6244,8 +6223,8 @@ namespace Vanish
                         drawItemTextWithRole(painter, r, alignment, palette, state & State_Enabled, tb->text, QPalette::ButtonText);
                     } else {
                         QPixmap pm;
-                        QSize   pmSize = tb->iconSize;
-                        QRect   pr = r;
+                        QSize pmSize = tb->iconSize;
+                        QRect pr = r;
 
                         if (!tb->icon.isNull()) {
                             QIcon::State state = tb->state & State_On ? QIcon::On : QIcon::Off;
@@ -6292,7 +6271,7 @@ namespace Vanish
                             if (Qt::ToolButtonTextUnderIcon == tb->toolButtonStyle) {
                                 pr.setHeight(pmSize.height() + 6);
 
-                                tr.adjust(0, pr.bottom() - 3, 0, 0); // -3);
+                                tr.adjust(0, pr.bottom() - 3, 0, 0);
                                 pr.translate(shiftX, shiftY);
                                 if (hasArrow)
                                     drawTbArrow(this, tb, pr, painter, widget);
@@ -6452,7 +6431,7 @@ namespace Vanish
                     QStyleOptionComplex opt(*option);
                     bool                mo(state & State_Enabled && state & State_MouseOver);
                     QRect               outer(r);
-                    int                 sliderWidth = /*qMin(2*r.width()/5, */CIRCULAR_SLIDER_SIZE/*)*/;
+                    int                 sliderWidth = CIRCULAR_SLIDER_SIZE;
 #ifdef DIAL_DOT_ON_RING
                     int                 halfWidth = sliderWidth / 2;
 #endif
@@ -6690,7 +6669,7 @@ namespace Vanish
                     }
 
                     if (!(bflags & State_Enabled))
-                        bflags &= ~(State_MouseOver/* | State_Raised*/);
+                        bflags &= ~State_MouseOver;
 
                     if (bflags & State_MouseOver)
                         bflags |= State_Raised;
@@ -6839,15 +6818,15 @@ namespace Vanish
             case CC_GroupBox:
                 if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
                     // Draw frame
-                    QRect textRect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                    QRect checkBoxRect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
+                    QRect textRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
+                    QRect checkBoxRect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
                     if (groupBox->subControls & QStyle::SC_GroupBoxFrame) {
                         QStyleOptionFrameV2 frame;
                         frame.QStyleOption::operator=(*groupBox);
                         frame.features = groupBox->features;
                         frame.lineWidth = groupBox->lineWidth;
                         frame.midLineWidth = groupBox->midLineWidth;
-                        frame.rect = /*proxy()->*/subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
+                        frame.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
 
                         if ((groupBox->features & QStyleOptionFrameV2::Flat) || !(opts.gbLabel & (GB_LBL_INSIDE | GB_LBL_OUTSIDE))) {
                             painter->save();
@@ -6858,7 +6837,7 @@ namespace Vanish
                                                     : textRect);
                             painter->setClipRegion(region);
                         }
-                        /*proxy()->*/drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
+                        drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
                         if ((groupBox->features & QStyleOptionFrameV2::Flat) || !(opts.gbLabel & (GB_LBL_INSIDE | GB_LBL_OUTSIDE)))
                             painter->restore();
                     }
@@ -6869,7 +6848,7 @@ namespace Vanish
                         if (textColor.isValid())
                             painter->setPen(textColor);
                         int alignment = int(groupBox->textAlignment);
-                        if (!/*proxy()->*/styleHint(QStyle::SH_UnderlineShortcut, option, widget))
+                        if (!styleHint(QStyle::SH_UnderlineShortcut, option, widget))
                             alignment |= Qt::TextHideMnemonic;
 
                         if (opts.gbLabel & GB_LBL_BOLD) {
@@ -6879,9 +6858,9 @@ namespace Vanish
                             painter->save();
                             painter->setFont(font);
                         }
-                        /*proxy()->*/drawItemText(painter, textRect,  Qt::TextShowMnemonic | Qt::AlignHCenter | alignment,
-                                                  palette, state & State_Enabled, groupBox->text,
-                                                  textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+                        drawItemText(painter, textRect,  Qt::TextShowMnemonic | Qt::AlignHCenter | alignment,
+                                     palette, state & State_Enabled, groupBox->text,
+                                     textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
 
                         if (opts.gbLabel & GB_LBL_BOLD)
                             painter->restore();
@@ -6890,7 +6869,6 @@ namespace Vanish
                             QStyleOptionFocusRect fropt;
                             fropt.QStyleOption::operator=(*groupBox);
                             fropt.rect = textRect;
-                            /*proxy()->*/
                             drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
                         }
                     }
@@ -6900,7 +6878,6 @@ namespace Vanish
                         QStyleOptionButton box;
                         box.QStyleOption::operator=(*groupBox);
                         box.rect = checkBoxRect;
-                        /*proxy()->*/
                         drawPrimitive(PE_IndicatorCheckBox, &box, painter, widget);
                     }
                 }
@@ -7200,7 +7177,7 @@ namespace Vanish
                             painter->drawPath(buildPath(r.adjusted(1, 1, 0, 1), WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
                                                         round < ROUND_SLIGHT
                                                         ? 0
-                                                        : round > ROUND_SLIGHT /*&& kwin*/
+                                                        : round > ROUND_SLIGHT
                                                         ? 5.0
                                                         : 1.0));
                             painter->restore();
@@ -7210,7 +7187,7 @@ namespace Vanish
                         painter->drawPath(buildPath(r, WIDGET_MDI_WINDOW_TITLE, ROUNDED_TOP,
                                                     round < ROUND_SLIGHT
                                                     ? 0
-                                                    : round > ROUND_SLIGHT /*&& kwin*/
+                                                    : round > ROUND_SLIGHT
                                                     ? 6.0
                                                     : 2.0));
 
@@ -7467,8 +7444,7 @@ namespace Vanish
                                        horiz(Qt::Horizontal == scrollbar->orientation),
                                        maxed(scrollbar->minimum == scrollbar->maximum),
                                        atMin(maxed || scrollbar->sliderValue == scrollbar->minimum),
-                                       atMax(maxed || scrollbar->sliderValue == scrollbar->maximum)/*,
-                                   inStack(0!=opts.tabBgnd && inStackWidget(widget))*/;
+                                       atMax(maxed || scrollbar->sliderValue == scrollbar->maximum);
                     QRect              subline(subControlRect(control, option, SC_ScrollBarSubLine, widget)),
                                        addline(subControlRect(control, option, SC_ScrollBarAddLine, widget)),
                                        subpage(subControlRect(control, option, SC_ScrollBarSubPage, widget)),
@@ -7523,8 +7499,7 @@ namespace Vanish
 
                     bool needsBaseBgnd = (opts.thinSbarGroove || opts.flatSbarButtons) &&
                                          widget && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
-                                         (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView")/* ||
-                                    !opts.gtkScrollViews && widget->parentWidget()->parentWidget()->inherits("QAbstractScrollArea")*/);
+                                         (widget->parentWidget()->parentWidget()->inherits("QComboBoxListView"));
 
                     if (needsBaseBgnd)
                         painter->fillRect(r, palette.brush(QPalette::Base));
