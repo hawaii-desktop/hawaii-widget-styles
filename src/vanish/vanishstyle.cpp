@@ -2490,11 +2490,7 @@ namespace Vanish
             case PM_IndicatorHeight:
             case PM_ExclusiveIndicatorWidth:
             case PM_ExclusiveIndicatorHeight:
-#ifdef PORT_DONE
-            case PM_CheckListControllerSize:
-            case PM_CheckListButtonSize:
                 return DO_EFFECT ? opts.crSize + 2 : opts.crSize;
-#endif
             case PM_TabBarTabOverlap:
                 return TAB_MO_GLOW == opts.tabMouseOver ? 0 : 1;
             case PM_ProgressBarChunkWidth:
@@ -7940,8 +7936,8 @@ namespace Vanish
             case CT_CheckBox:
                 if (const QStyleOptionButton *btn = qstyleoption_cast<const QStyleOptionButton *>(option)) {
                     bool isRadio = CT_RadioButton == type;
-                    int  w = /*proxy()->*/pixelMetric(isRadio ? PM_ExclusiveIndicatorWidth : PM_IndicatorWidth, btn, widget),
-                         h = /*proxy()->*/pixelMetric(isRadio ? PM_ExclusiveIndicatorHeight : PM_IndicatorHeight, btn, widget),
+                    int  w = pixelMetric(isRadio ? PM_ExclusiveIndicatorWidth : PM_IndicatorWidth, btn, widget),
+                         h = pixelMetric(isRadio ? PM_ExclusiveIndicatorHeight : PM_IndicatorHeight, btn, widget),
                          margins = 0;
 
                     newSize = size;
