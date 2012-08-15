@@ -32,9 +32,7 @@
 #include <QColor>
 #include <QStyleOption>
 #include <QBitmap>
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
-#  include <QFormLayout>
-#endif
+#include <QFormLayout>
 
 typedef qulonglong QtcKey;
 #include "common.h"
@@ -131,10 +129,8 @@ namespace Vanish
         void polish(QPalette &palette);
         void polish(QWidget *widget);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(4, 4, 0))
         void polishFormLayout(QFormLayout *layout);
         void polishLayout(QLayout *layout);
-#endif
         void polishScrollArea(QAbstractScrollArea *scrollArea, bool isKFilePlacesView = false) const;
 
         void unpolish(QApplication *app);

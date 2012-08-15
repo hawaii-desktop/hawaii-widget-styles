@@ -25,37 +25,19 @@ The code has been modified to work with QColor (Qt3 &Qt4) and GdkColor
 #include "config.h"
 #include "common.h"
 
-#ifdef __cplusplus
 #include <qglobal.h>
-#endif
 
 #if !(defined QT_VERSION && (QT_VERSION >= 0x040000) && !defined QTC_QT_ONLY)
 
 #include <math.h>
-
-#if defined _WIN32 && defined QT_VERSION && (QT_VERSION >= 0x040000)
-#include <sys/stat.h>
-#include <float.h>
-#include <direct.h>
-
-static int isnan(double x)
-{
-    return _isnan(x);
-}
-#endif
 
 static inline int qtcLimit(double c)
 {
     return c < 0.0 ? 0 : (c > 255.0  ? 255 : (int)c);
 }
 
-#if defined QT_VERSION && (QT_VERSION >= 0x040000)
 #define FLOAT_COLOR(VAL, COL) (VAL).COL##F()
 #define TO_COLOR(R, G, B) QColor::fromRgbF(R, G, B)
-#else
-#define FLOAT_COLOR(VAL, COL) ((double)(((VAL).COL()*1.0)/255.0))
-#define TO_COLOR(R, G, B) QColor(qtcLimit(R*255.0), qtcLimit(G*255.0), qtcLimit(B*255.0))
-#endif
 
 static inline double ColorUtils_normalize(double a)
 {
@@ -70,7 +52,7 @@ static inline double ColorUtils_wrap(double a)
 }
 
 #define HCY_REC 709 // use 709 for now
-#if   HCY_REC == 601
+#if HCY_REC == 601
 static const double yc[3] = { 0.299, 0.587, 0.114 };
 #elif HCY_REC == 709
 static const double yc[3] = {0.2126, 0.7152, 0.0722};
@@ -193,7 +175,6 @@ static color ColorUtils_HCY_toColor(ColorUtils_HCY *hcy)
         return TO_COLOR(ColorUtils_HCY_igamma(tp), ColorUtils_HCY_igamma(tn), ColorUtils_HCY_igamma(to));
 }
 
-// #ifndef __cplusplus
 static inline double ColorUtils_HCY_luma(const color *color)
 {
     return ColorUtils_HCY_lumag(ColorUtils_HCY_gamma(FLOAT_COLOR(*color, red)),

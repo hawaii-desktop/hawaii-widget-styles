@@ -61,31 +61,6 @@
 
 namespace Vanish
 {
-
-#if QT_VERSION < 0x040600
-    QtCPointer &QtCPointer::operator=(QWidget *w)
-    {
-        widget_ = w;
-        if (widget_)
-            Utils::addEventFilter(widget_, this);
-        return *this;
-    }
-
-    void QtCPointer::clear()
-    {
-        if (widget_)
-            widget_->removeEventFilter(this);
-        widget_ = 0L;
-    }
-
-    bool QtCPointer::eventFilter(QObject *o, QEvent *e)
-    {
-        if (o == widget_ && QEvent::Destroy == e->type())
-            widget_ = 0L;
-        return false;
-    }
-#endif
-
     //_____________________________________________________________
     WindowManager::WindowManager(QObject *parent):
         QObject(parent),
@@ -663,7 +638,6 @@ namespace Vanish
     //_____________________________________________________________
     bool WindowManager::AppEventFilter::appMouseEvent(QObject *object, QEvent *event)
     {
-
         Q_UNUSED(object);
 
         // store target window (see later)
@@ -689,8 +663,5 @@ namespace Vanish
         }
 
         return true;
-
     }
-
-
 }

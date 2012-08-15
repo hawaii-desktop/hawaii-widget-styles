@@ -44,26 +44,6 @@
 
 namespace Vanish
 {
-#if QT_VERSION < 0x040600
-    class QtCPointer : public QObject
-    {
-    public:
-        QtCPointer(QWidget *w = 0L) : widget_(w) {}
-        QtCPointer &operator=(QWidget *w);
-        operator bool() const {
-            return 0L != widget_;
-        }
-        void clear();
-        bool eventFilter(QObject *, QEvent *);
-        QWidget *data() {
-            return widget_;
-        }
-
-    private:
-        QWidget *widget_;
-    };
-#endif
-
     class WindowManager: public QObject
     {
 
@@ -259,11 +239,7 @@ namespace Vanish
 
         //! target being dragged
         /*! QWeakPointer is used in case the target gets deleted while drag is in progress */
-#if QT_VERSION < 0x040600
-        QtCPointer _target;
-#else
         QWeakPointer<QWidget> _target;
-#endif
 
         //! true if drag is about to start
         bool _dragAboutToStart;
