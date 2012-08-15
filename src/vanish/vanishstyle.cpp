@@ -2386,19 +2386,19 @@ namespace Vanish
             case PM_DockWidgetTitleMargin:
                 return !(opts.dwtSettings & DWT_TEXT_ALIGN_AS_PER_TITLEBAR) || ALIGN_LEFT == opts.titlebarAlignment ? 4 : 0;
             case PM_DockWidgetTitleBarButtonMargin:
-                return 4;
+                return int(dpiScaled(4));
             case PM_DockWidgetFrameWidth:
                 return 2;
             case PM_ToolBarExtensionExtent:
-                return 15;
+                return int(dpiScaled(15));
                 // TODO: Size from settings
             case PM_SmallIconSize:
-                return 16;
+                return int(dpiScaled(16));
             case PM_ToolBarIconSize:
-                return 22;
+                return int(dpiScaled(22));
             case PM_IconViewIconSize:
             case PM_LargeIconSize:
-                return 32;
+                return int(dpiScaled(32));
             case PM_SubMenuOverlap:
                 return -2;
             case PM_ScrollView_ScrollBarSpacing:
@@ -2408,18 +2408,18 @@ namespace Vanish
             case PM_SizeGripSize:
                 return SIZE_GRIP_SIZE;
             case PM_TabBarScrollButtonWidth:
-                return 18;
+                return int(dpiScaled(18));
             case PM_HeaderMargin:
-                return 3;
+                return int(dpiScaled(3));
             case PM_DefaultChildMargin:
-                return isOOWidget(widget) ? 2 : 6;
+                return int(dpiScaled(isOOWidget(widget) ? 2 : 6));
             case PM_DefaultTopLevelMargin:
-                return 9;
+                return int(dpiScaled(9));
             case PM_LayoutHorizontalSpacing:
             case PM_LayoutVerticalSpacing:
                 return -1; // TODO: use layoutSpacingImplementation
             case PM_DefaultLayoutSpacing:
-                return 6;
+                return int(dpiScaled(6));
             case PM_LayoutLeftMargin:
             case PM_LayoutTopMargin:
             case PM_LayoutRightMargin:
@@ -2437,7 +2437,7 @@ namespace Vanish
                 return 1;
             case PM_FocusFrameVMargin:
             case PM_FocusFrameHMargin:
-                return 2;
+                return int(dpiScaled(2));
             case PM_MenuBarVMargin:
             case PM_MenuBarHMargin:
                 // Bangarang (media player) has a 4 pixel high menubar at the top - when it doesn't actually have a menubar!
@@ -2448,8 +2448,8 @@ namespace Vanish
             case PM_MenuVMargin:
                 return 0;
             case PM_MenuButtonIndicator:
-                return (DO_EFFECT ? 10 : 9) +
-                       (!widget || qobject_cast<const QToolButton *>(widget) ? 6 : 0);
+                return int(dpiScaled((DO_EFFECT ? 10 : 9) +
+                                     (!widget || qobject_cast<const QToolButton *>(widget) ? 6 : 0)));
             case PM_ButtonMargin:
                 return (DO_EFFECT
                         ? (opts.thin & THIN_BUTTONS) ? 4 : 6
@@ -2465,7 +2465,7 @@ namespace Vanish
             case PM_ButtonDefaultIndicator:
                 return 0;
             case PM_DefaultFrameWidth:
-                if ((/*!opts.popupBorder || */opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
+                if ((opts.gtkComboMenus) && widget && widget->inherits("QComboBoxPrivateContainer"))
                     return opts.gtkComboMenus ? (opts.borderMenuitems || !(opts.square & SQUARE_POPUP_MENUS) ? 2 : 1) : 0;
 
                 if ((!opts.gtkScrollViews || (opts.square & SQUARE_SCROLLVIEW)) && isKateView(widget))
@@ -2479,7 +2479,7 @@ namespace Vanish
                     return 1;
 
                 if (DO_EFFECT && opts.etchEntry &&
-                        (!widget || // !isFormWidget(widget) &&
+                        (!widget ||
                          ::qobject_cast<const QLineEdit *>(widget) || ::qobject_cast<const QAbstractScrollArea *>(widget)))
                     return 3;
                 else
@@ -2490,7 +2490,7 @@ namespace Vanish
             case PM_IndicatorHeight:
             case PM_ExclusiveIndicatorWidth:
             case PM_ExclusiveIndicatorHeight:
-                return DO_EFFECT ? opts.crSize + 2 : opts.crSize;
+                return DO_EFFECT ? int(dpiScaled(opts.crSize)) + 2 : int(dpiScaled(opts.crSize));
             case PM_TabBarTabOverlap:
                 return TAB_MO_GLOW == opts.tabMouseOver ? 0 : 1;
             case PM_ProgressBarChunkWidth:
@@ -2503,21 +2503,21 @@ namespace Vanish
             case PM_ToolBarHandleExtent:
                 return LINE_1DOT == opts.handles ? 7 : 8;
             case PM_ScrollBarSliderMin:
-                return opts.sliderWidth + 1;
+                return int(dpiScaled(opts.sliderWidth + 1));
             case PM_SliderThickness:
-                return (SLIDER_CIRCULAR == opts.sliderStyle
-                        ? CIRCULAR_SLIDER_SIZE + 6
-                        : SLIDER_TRIANGULAR == opts.sliderStyle
-                        ? 19
-                        : (SLIDER_SIZE + (ROTATED_SLIDER ? 11 : 6))) + SLIDER_GLOW;
+                return int(dpiScaled((SLIDER_CIRCULAR == opts.sliderStyle
+                                      ? CIRCULAR_SLIDER_SIZE + 6
+                                      : SLIDER_TRIANGULAR == opts.sliderStyle
+                                      ? 19
+                                      : (SLIDER_SIZE + (ROTATED_SLIDER ? 11 : 6))) + SLIDER_GLOW));
             case PM_SliderControlThickness:
-                return (SLIDER_CIRCULAR == opts.sliderStyle
-                        ? CIRCULAR_SLIDER_SIZE
-                        : SLIDER_TRIANGULAR == opts.sliderStyle
-                        ? 11
-                        : (SLIDER_SIZE + (ROTATED_SLIDER ? 6 : -2))) + SLIDER_GLOW;
+                return int(dpiScaled((SLIDER_CIRCULAR == opts.sliderStyle
+                                      ? CIRCULAR_SLIDER_SIZE
+                                      : SLIDER_TRIANGULAR == opts.sliderStyle
+                                      ? 11
+                                      : (SLIDER_SIZE + (ROTATED_SLIDER ? 6 : -2))) + SLIDER_GLOW));
             case PM_SliderTickmarkOffset:
-                return SLIDER_TRIANGULAR == opts.sliderStyle ? 5 : 4;
+                return int(dpiScaled(SLIDER_TRIANGULAR == opts.sliderStyle ? 5 : 4));
             case PM_SliderSpaceAvailable:
                 if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
                     int size(pixelMetric(PM_SliderControlThickness, slider, widget));
@@ -2530,13 +2530,13 @@ namespace Vanish
                 }
                 return QCommonStyle::pixelMetric(metric, option, widget);
             case PM_SliderLength:
-                return (SLIDER_CIRCULAR == opts.sliderStyle
-                        ? CIRCULAR_SLIDER_SIZE
-                        : SLIDER_TRIANGULAR == opts.sliderStyle
-                        ? 11
-                        : (SLIDER_SIZE + (ROTATED_SLIDER ? -2 : 6))) + SLIDER_GLOW;
+                return int(dpiScaled((SLIDER_CIRCULAR == opts.sliderStyle
+                                      ? CIRCULAR_SLIDER_SIZE
+                                      : SLIDER_TRIANGULAR == opts.sliderStyle
+                                      ? 11
+                                      : (SLIDER_SIZE + (ROTATED_SLIDER ? -2 : 6))) + SLIDER_GLOW));
             case PM_ScrollBarExtent:
-                return opts.sliderWidth;
+                return int(dpiScaled(opts.sliderWidth));
             case PM_MaximumDragDistance:
                 return -1;
             case PM_TabBarTabHSpace:
@@ -2544,9 +2544,9 @@ namespace Vanish
             case PM_TabBarTabVSpace:
                 return opts.highlightTab ? 10 : 8;
             case PM_TitleBarHeight:
-                return qMax(widget ? widget->fontMetrics().lineSpacing()
-                            : option ? option->fontMetrics.lineSpacing()
-                            : 0, 24);
+                return int(dpiScaled(qMax(widget ? widget->fontMetrics().lineSpacing()
+                                          : option ? option->fontMetrics.lineSpacing()
+                                          : 0, 24)));
             case PM_MenuBarPanelWidth:
                 return 0;
             case QtC_Round:

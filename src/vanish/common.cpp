@@ -33,6 +33,8 @@
 #include "common.h"
 #include "colorutils.h"
 
+Q_GUI_EXPORT int qt_defaultDpiX();
+
 /* Taken from rgb->hsl routines taken from KColor
     Copyright 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
 */
@@ -572,4 +574,10 @@ double qtcShineAlpha(const color *bgnd)
            v = 0;
     qtcRgbToHsv(r, g, b, &h, &s, &v);
     return v * 0.8;
+}
+
+qreal dpiScaled(qreal value)
+{
+    static const qreal scale = qreal(qt_defaultDpiX()) / 96.0;
+    return value * scale;
 }

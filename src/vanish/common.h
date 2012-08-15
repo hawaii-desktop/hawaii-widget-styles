@@ -1109,5 +1109,6 @@ extern ERound qtcGetWidgetRound(const Options *opts, int w, int h, EWidget widge
 extern double qtcGetRadius(const Options *opts, int w, int h, EWidget widget, ERadius rad);
 extern double qtcShineAlpha(const color *bgnd);
 extern void qtcCalcRingAlphas(const color *bgnd);
+extern qreal dpiScaled(qreal value);
 
 #endif // __COMMON_H__
