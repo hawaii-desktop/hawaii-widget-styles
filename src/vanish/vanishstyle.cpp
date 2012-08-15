@@ -1407,13 +1407,13 @@ namespace Vanish
             if (opts.forceAlternateLvCols &&
                     viewport->autoFillBackground() && // Dolphins Folders panel
                     //255==viewport->palette().color(itemView->viewport()->backgroundRole()).alpha() && // KFilePlacesView
-                    !widget->inherits("KFilePlacesView") &&
+                    !widget->inherits("VFilePlacesView") &&
                     // Exclude non-editable combo popup...
                     !(opts.gtkComboMenus && widget->inherits("QComboBoxListView") && widget->parentWidget() && widget->parentWidget()->parentWidget() &&
                       qobject_cast<QComboBox *>(widget->parentWidget()->parentWidget()) &&
                       !static_cast<QComboBox *>(widget->parentWidget()->parentWidget())->isEditable()) &&
                     // Exclude KAboutDialog...
-                    !parentIs(widget, 5, "KAboutApplicationDialog") &&
+                    !parentIs(widget, 5, "VAboutDialog") &&
                     (qobject_cast<QTreeView *>(widget) || (qobject_cast<QListView *>(widget) && QListView::IconMode != ((QListView *)widget)->viewMode())))
                 itemView->setAlternatingRowColors(true);
         }
@@ -1451,7 +1451,7 @@ namespace Vanish
             widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
             if (!opts.gtkScrollViews)
                 Utils::addEventFilter(widget, this);
-        } else if (qobject_cast<QAbstractScrollArea *>(widget) && widget->inherits("KFilePlacesView")) {
+        } else if (qobject_cast<QAbstractScrollArea *>(widget) && widget->inherits("VFilePlacesView")) {
             if (CUSTOM_BGND)
                 polishScrollArea(static_cast<QAbstractScrollArea *>(widget), true);
             Utils::addEventFilter(widget, this);
@@ -1480,7 +1480,7 @@ namespace Vanish
             if (WM_DRAG_ALL == opts.windowDrag &&
                     ((QLabel *)widget)->textInteractionFlags().testFlag(Qt::TextSelectableByMouse) &&
                     widget->parentWidget() && widget->parentWidget()->parentWidget() && ::qobject_cast<QFrame *>(widget->parentWidget()) &&
-                    widget->parentWidget()->parentWidget()->inherits("KTitleWidget")
+                    widget->parentWidget()->parentWidget()->inherits("VTitleWidget")
                )
                 ((QLabel *)widget)->setTextInteractionFlags(((QLabel *)widget)->textInteractionFlags()&~Qt::TextSelectableByMouse);
 
@@ -1549,7 +1549,7 @@ namespace Vanish
                 //else if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 Utils::addEventFilter(widget, this);
 
-                if (widget->parent() && widget->parent()->inherits("KTitleWidget")) {
+                if (widget->parent() && widget->parent()->inherits("VTitleWidget")) {
                     if (CUSTOM_BGND)
                         frame->setAutoFillBackground(false);
                     else
@@ -1925,7 +1925,7 @@ namespace Vanish
                 //             if (QFrame::HLine==frame->frameShape() || QFrame::VLine==frame->frameShape())
                 widget->removeEventFilter(this);
 
-                if (widget->parent() && widget->parent()->inherits("KTitleWidget")) {
+                if (widget->parent() && widget->parent()->inherits("VTitleWidget")) {
                     if (CUSTOM_BGND)
                         frame->setAutoFillBackground(true);
                     else
@@ -2011,7 +2011,7 @@ namespace Vanish
                 return true;
         }
 
-        if (QEvent::Show == event->type() && qobject_cast<QAbstractScrollArea *>(object) && object->inherits("KFilePlacesView")) {
+        if (QEvent::Show == event->type() && qobject_cast<QAbstractScrollArea *>(object) && object->inherits("VFilePlacesView")) {
             QWidget  *view   = ((QAbstractScrollArea *)object)->viewport();
             QPalette palette = view->palette();
             QColor   color   = ((QWidget *)object)->palette().background().color();
@@ -3296,7 +3296,7 @@ namespace Vanish
                 if (isOOWidget(widget) && r.height() < 22)
                     break;
 
-                if (widget && widget->parent() && widget->parent()->inherits("KTitleWidget"))
+                if (widget && widget->parent() && widget->parent()->inherits("VTitleWidget"))
                     break;
                 else if (widget && widget->parent() && qobject_cast<const QComboBox *>(widget->parent())) {
                     if (opts.gtkComboMenus && !((QComboBox *)(widget->parent()))->isEditable())
@@ -3963,7 +3963,7 @@ namespace Vanish
                             if (ROUNDED) {
                                 bool square((opts.square & SQUARE_LISTVIEW_SELECTION) &&
                                             (( /*(!widget && r.height()<=40 && r.width()>=48) || */
-                                                 (widget && !widget->inherits("KFilePlacesView") &&
+                                                 (widget && !widget->inherits("VFilePlacesView") &&
                                                   (qobject_cast<const QTreeView *>(widget) ||
                                                    (qobject_cast<const QListView *>(widget) &&
                                                     QListView::IconMode != ((const QListView *)widget)->viewMode())))) ||
@@ -4322,7 +4322,7 @@ namespace Vanish
                                  : palette.color(cg, QPalette::Highlight));
                     bool   square((opts.square & SQUARE_LISTVIEW_SELECTION) &&
                                   (/*(!widget && r.height()<=40 && r.width()>=48) || */
-                                      (widget && !widget->inherits("KFilePlacesView") &&
+                                      (widget && !widget->inherits("VFilePlacesView") &&
                                        (qobject_cast<const QTreeView *>(widget) ||
                                         (qobject_cast<const QListView *>(widget) &&
                                          QListView::IconMode != ((const QListView *)widget)->viewMode()))))),
