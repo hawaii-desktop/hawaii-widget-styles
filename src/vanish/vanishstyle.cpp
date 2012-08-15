@@ -2765,12 +2765,9 @@ namespace Vanish
 
     QPalette Style::standardPalette() const
     {
-#if 0
-        return QCommonStyle::standardPalette();
-#else
         QPalette palette;
 
-        palette.setBrush(QPalette::Active, QPalette::Window, QColor(QRgb(0xffdadada)));
+        palette.setBrush(QPalette::Active, QPalette::Window, QColor(QRgb(0xfff7f7f7)));
         palette.setBrush(QPalette::Active, QPalette::WindowText, QColor(QRgb(0xff2e3436)));
         palette.setBrush(QPalette::Active, QPalette::Button, QColor(QRgb(0xffededed)));
         palette.setBrush(QPalette::Active, QPalette::Light, QColor(QRgb(0xffffffff)));
@@ -2806,26 +2803,17 @@ namespace Vanish
         palette.setBrush(QPalette::Inactive, QPalette::Link, palette.link());
         palette.setBrush(QPalette::Inactive, QPalette::LinkVisited, palette.linkVisited());
 
-        palette.setBrush(QPalette::Disabled, QPalette::Window, QColor(QRgb(0xfff1f0ef)));
-        palette.setBrush(QPalette::Disabled, QPalette::WindowText, QColor(QRgb(0xffa7aba7)));
-        palette.setBrush(QPalette::Disabled, QPalette::Button, QColor(QRgb(0xffdddfe4)));
-        palette.setBrush(QPalette::Disabled, QPalette::Light, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::Midlight, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::Dark, QColor(QRgb(0xff555555)));
-        palette.setBrush(QPalette::Disabled, QPalette::Mid, QColor(QRgb(0xffc7c7c7)));
-        palette.setBrush(QPalette::Disabled, QPalette::Text, QColor(QRgb(0xffc7c7c7)));
-        palette.setBrush(QPalette::Disabled, QPalette::BrightText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::ButtonText, QColor(QRgb(0xff808080)));
-        palette.setBrush(QPalette::Disabled, QPalette::Base, QColor(QRgb(0xffefefef)));
-        palette.setBrush(QPalette::Disabled, QPalette::AlternateBase, palette.color(QPalette::Disabled, QPalette::Base).darker(110));
-        palette.setBrush(QPalette::Disabled, QPalette::Shadow, QColor(QRgb(0xff000000)));
-        palette.setBrush(QPalette::Disabled, QPalette::Highlight, QColor(QRgb(0xff567594)));
-        palette.setBrush(QPalette::Disabled, QPalette::HighlightedText, QColor(QRgb(0xffffffff)));
-        palette.setBrush(QPalette::Disabled, QPalette::Link, QColor(QRgb(0xff0000ee)));
-        palette.setBrush(QPalette::Disabled, QPalette::LinkVisited, QColor(QRgb(0xff52188b)));
+        for (int i = 0; i < QPalette::NColorRoles; i++) {
+            palette.setColor(QPalette::Disabled, QPalette::ColorRole(i),
+                             palette.color(QPalette::Active, QPalette::ColorRole(i)));
+
+            palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+            palette.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
+            palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+            palette.setColor(QPalette::Disabled, QPalette::HighlightedText, Qt::darkGray);
+        }
 
         return palette;
-#endif
     }
 
     QIcon Style::standardIconImplementation(StandardPixmap pix, const QStyleOption *option, const QWidget *widget) const
@@ -11192,11 +11180,11 @@ namespace Vanish
 
     const QColor *Style::getMdiColors(const QStyleOption *option, bool active) const
     {
-#ifdef PORT_DONE
         if (!itsActiveMdiColors) {
             itsActiveMdiTextColor = option ? option->palette.text().color() : QApplication::palette().text().color();
             itsMdiTextColor = option ? option->palette.text().color() : QApplication::palette().text().color();
 
+#ifdef PORT_DONE
             QFile f(kdeHome() + "/share/config/kdeglobals");
 
             if (f.open(QIODevice::ReadOnly)) {
@@ -11235,6 +11223,7 @@ namespace Vanish
                 }
                 f.close();
             }
+#endif
 
             if (!itsActiveMdiColors)
                 itsActiveMdiColors = (QColor *)itsBackgroundCols;
@@ -11247,7 +11236,6 @@ namespace Vanish
         }
 
         return active ? itsActiveMdiColors : itsMdiColors;
-#endif
     }
 
     void Style::readMdiPositions() const
