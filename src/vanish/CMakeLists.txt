@@ -32,8 +32,7 @@ target_link_libraries(vanish
     ${VibeCore_LIBRARIES}
 )
 
-#install(TARGETS vanish LIBRARY DESTINATION ${CMAKE_INSTALL_PLUGINSDIR}/styles)
-install(TARGETS vanish LIBRARY DESTINATION /opt/qt5/plugins/styles)
+install(TARGETS vanish LIBRARY DESTINATION ${CMAKE_INSTALL_PLUGINSDIR}/styles)
 
 # Subdirectories
 #add_subdirectory(config)
