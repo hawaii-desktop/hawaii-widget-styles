@@ -1,41 +1,46 @@
-#ifndef __SHORTCUT_HANDLER_H__
-#define __SHORTCUT_HANDLER_H__
+/****************************************************************************
+ * This file is part of Vanish.
+ *
+ * Copyright (c) 2011-2012 Pier Luigi Fiorini
+ * Copyright (c) 2007-2010 Craig Drummond
+ *
+ * Author(s):
+ *    Craig Drummond <craig.p.drummond@gmail.com>
+ *    Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ *
+ * $BEGIN_LICENSE:LGPL$
+ *
+ * Vanish is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * Vanish is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Vanish.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * $END_LICENSE$
+ ***************************************************************************/
 
-/*
-  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+#ifndef SHORTCUTHANDLER_H
+#define SHORTCUTHANDLER_H
 
-  ----
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public
-  License version 2 as published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; see the file COPYING.  If not, write to
-  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  Boston, MA 02110-1301, USA.
-*/
-
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QList>
+#include <QObject>
+#include <QSet>
+#include <QList>
 
 class QWidget;
 
 namespace Vanish
 {
-
     class ShortcutHandler : public QObject
     {
         Q_OBJECT
-
     public:
-
         explicit ShortcutHandler(QObject *parent = 0);
         virtual ~ShortcutHandler();
 
@@ -46,22 +51,18 @@ namespace Vanish
         bool showShortcut(const QWidget *widget) const;
 
     private Q_SLOTS:
-
         void widgetDestroyed(QObject *o);
 
     protected:
-
         void updateWidget(QWidget *w);
         bool eventFilter(QObject *watched, QEvent *event);
 
     private:
-
         bool             itsAltDown;
         QSet<QWidget *>  itsSeenAlt,
              itsUpdated;
         QList<QWidget *> itsOpenMenus;
     };
-
 }
 
-#endif
+#endif // SHORTCUTHANDLER_H

@@ -1,25 +1,33 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+/****************************************************************************
+ * This file is part of Vanish.
+ *
+ * Copyright (c) 2011-2012 Pier Luigi Fiorini
+ * Copyright (c) 2003-2010 Craig Drummond
+ *
+ * Author(s):
+ *    Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ *    Craig Drummond <craig.p.drummond@gmail.com>
+ *
+ * $BEGIN_LICENSE:LGPL$
+ *
+ * Vanish is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * Vanish is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Vanish.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * $END_LICENSE$
+ ***************************************************************************/
 
-/*
-  Vanish (C) Craig Drummond, 2003 - 2010 craig.p.drummond@gmail.com
-
-  ----
-
-  This program is free software; you can redistr ibute it and/or
-  modify it under the terms of the GNU General Public
-  License version 2 as published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; see the file COPYING.  If not, write to
-  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  Boston, MA 02110-1301, USA.
-*/
+#ifndef COMMON_H
+#define COMMON_H
 
 #include "config.h"
 
@@ -138,14 +146,14 @@ enum {
 #define SUNKEN_BEVEL_DARK_ALPHA(X)  (X.value()/800.0) // 0.25
 #define SUNKEN_BEVEL_LIGHT_ALPHA(X) (X.value()/500.0) // 0.40
 
-#define MENU_SIZE_ATOM        "_QTCURVE_MENUBAR_SIZE_"
-#define STATUSBAR_ATOM        "_QTCURVE_STATUSBAR_"
-#define TITLEBAR_SIZE_ATOM    "_QTCURVE_TITLEBAR_SIZE_"
-#define ACTIVE_WINDOW_ATOM    "_QTCURVE_ACTIVE_WINDOW_"
-#define TOGGLE_MENUBAR_ATOM   "_QTCURVE_TOGGLE_MENUBAR_"
-#define TOGGLE_STATUSBAR_ATOM "_QTCURVE_TOGGLE_STATUSBAR_"
-#define OPACITY_ATOM          "_QTCURVE_OPACITY_"
-#define BGND_ATOM             "_QTCURVE_BGND_"
+#define MENU_SIZE_ATOM        "_VANISH_MENUBAR_SIZE_"
+#define STATUSBAR_ATOM        "_VANISH_STATUSBAR_"
+#define TITLEBAR_SIZE_ATOM    "_VANISH_TITLEBAR_SIZE_"
+#define ACTIVE_WINDOW_ATOM    "_VANISH_ACTIVE_WINDOW_"
+#define TOGGLE_MENUBAR_ATOM   "_VANISH_TOGGLE_MENUBAR_"
+#define TOGGLE_STATUSBAR_ATOM "_VANISH_TOGGLE_STATUSBAR_"
+#define OPACITY_ATOM          "_VANISH_OPACITY_"
+#define BGND_ATOM             "_VANISH_BGND_"
 #define BLEND_TITLEBAR     (opts.menubarAppearance==opts.titlebarAppearance && opts.menubarAppearance==opts.inactiveTitlebarAppearance && \
                             !(opts.windowBorder&WINDOW_BORDER_BLEND_TITLEBAR) && SHADE_WINDOW_BORDER==opts.shadeMenubars && opts.windowDrag)
 
@@ -379,8 +387,8 @@ typedef enum {
 #define WINDOW_TEXT_SHADOW_ALPHA(A) (EFFECT_SHADOW==(A) ? 0.10 : 0.60)
 #define WINDOW_SHADOW_COLOR(A)      (EFFECT_SHADOW==(A) ? Qt::black : Qt::white)
 
-#define QTCURVE_PREVIEW_CONFIG      "QTCURVE_PREVIEW_CONFIG"
-#define QTCURVE_PREVIEW_CONFIG_FULL "QTCURVE_PREVIEW_CONFIG_FULL"
+#define VANISH_PREVIEW_CONFIG      "VANISH_PREVIEW_CONFIG"
+#define VANISH_PREVIEW_CONFIG_FULL "VANISH_PREVIEW_CONFIG_FULL"
 
 typedef enum {
     DWT_BUTTONS_AS_PER_TITLEBAR    = 0x0001,

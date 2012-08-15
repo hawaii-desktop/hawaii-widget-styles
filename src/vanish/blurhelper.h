@@ -1,6 +1,3 @@
-#ifndef blurhelper_h
-#define blurhelper_h
-
 //////////////////////////////////////////////////////////////////////////////
 // oxygenblurhelper.h
 // handle regions passed to kwin for blurring
@@ -30,27 +27,27 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "utils.h"
+#ifndef BLURHELPER_H
+#define BLURHELPER_H
 
-#include <QtCore/QObject>
-#include <QtCore/QPointer>
-#include <QtCore/QHash>
-#include <QtCore/QBasicTimer>
-#include <QtCore/QTimerEvent>
-#include <QtWidgets/QDockWidget>
-#include <QtWidgets/QMenu>
-#include <QtGui/QRegion>
-#include <QtWidgets/QToolBar>
+#include <QObject>
+#include <QPointer>
+#include <QHash>
+#include <QBasicTimer>
+#include <QTimerEvent>
+#include <QDockWidget>
+#include <QMenu>
+#include <QRegion>
+#include <QToolBar>
+
+#include "utils.h"
 
 namespace Vanish
 {
     class BlurHelper: public QObject
     {
-
         Q_OBJECT
-
     public:
-
         //! constructor
         BlurHelper(QObject *);
 
@@ -78,7 +75,6 @@ namespace Vanish
         virtual bool eventFilter(QObject *, QEvent *);
 
     protected:
-
         //! timer event
         /*! used to perform delayed blur region update of pending widgets */
         virtual void timerEvent(QTimerEvent *event) {
@@ -86,8 +82,8 @@ namespace Vanish
             if (event->timerId() == _timer.timerId()) {
                 _timer.stop();
                 update();
-            } else QObject::timerEvent(event);
-
+            } else
+                QObject::timerEvent(event);
         }
 
         //! get list of blur-behind regions matching a given widget
@@ -98,21 +94,19 @@ namespace Vanish
 
         //! update blur region for all pending widgets
         /*! a timer is used to allow some buffering of the update requests */
-        void delayedUpdate(void) {
-            if (!_timer.isActive()) {
+        void delayedUpdate() {
+            if (!_timer.isActive())
                 _timer.start(10, this);
-            }
         }
 
         //! update blur region for all pending widgets
-        void update(void) {
-
+        void update() {
             foreach(const WidgetPointer & widget, _pendingWidgets) {
-                if (widget) update(widget.data());
+                if (widget)
+                    update(widget.data());
             }
 
             _pendingWidgets.clear();
-
         }
 
         //! update blur regions for given widget
@@ -123,12 +117,10 @@ namespace Vanish
 
         //! returns true if a given widget is opaque
         bool isOpaque(const QWidget *widget) const {
-
             return
                 (!widget->isWindow()) &&
                 ((widget->autoFillBackground() && widget->palette().color(widget->backgroundRole()).alpha() == 0xff) ||
                  widget->testAttribute(Qt::WA_OpaquePaintEvent));
-
         }
 
         //! true if widget is a transparent window
@@ -137,7 +129,6 @@ namespace Vanish
         inline bool isTransparent(const QWidget *widget) const;
 
     private:
-
         //! enability
         bool _enabled;
 
@@ -172,4 +163,4 @@ namespace Vanish
     }
 }
 
-#endif
+#endif // BLURHELPER_H

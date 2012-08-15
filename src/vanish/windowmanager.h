@@ -1,5 +1,5 @@
-#ifndef __WINDOW_MANAGER_H__
-#define __WINDOW_MANAGER_H__
+#ifndef WINDOWMANAGER_H
+#define WINDOWMANAGER_H
 
 // Copied from oxygenwindowmanager.h svnversion: 1137195
 
@@ -32,25 +32,21 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include <QtCore/QEvent>
+#include <QEvent>
+#include <QBasicTimer>
+#include <QObject>
+#include <QSet>
+#include <QString>
+#include <QWeakPointer>
 
-#include <QtCore/QBasicTimer>
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include <QtCore/QString>
-#include <QtCore/QWeakPointer>
-
-#include <QtWidgets/QWidget>
+#include <QWidget>
 
 namespace Vanish
 {
     class WindowManager: public QObject
     {
-
         Q_OBJECT
-
     public:
-
         //! constructor
         explicit WindowManager(QObject *);
 
@@ -72,7 +68,6 @@ namespace Vanish
         virtual bool eventFilter(QObject *, QEvent *);
 
     protected:
-
         //! timer event,
         /*! used to start drag if button is pressed for a long enough time */
         void timerEvent(QTimerEvent *);
@@ -175,7 +170,6 @@ namespace Vanish
         //@}
 
     private:
-
         //! enability
         bool _enabled;
 
@@ -194,7 +188,6 @@ namespace Vanish
         class ExceptionId: public QPair<QString, QString>
         {
         public:
-
             //! constructor
             ExceptionId(const QString &value) {
                 const QStringList args(value.split("@"));
@@ -210,7 +203,6 @@ namespace Vanish
             const QString &className(void) const {
                 return second;
             }
-
         };
 
         //! exception set
@@ -261,9 +253,7 @@ namespace Vanish
         */
         class AppEventFilter: public QObject
         {
-
         public:
-
             //! constructor
             AppEventFilter(WindowManager *parent):
                 QObject(parent),
@@ -274,16 +264,13 @@ namespace Vanish
             virtual bool eventFilter(QObject *, QEvent *);
 
         protected:
-
             //! application-wise event.
             /*! needed to catch end of XMoveResize events */
             bool appMouseEvent(QObject *, QEvent *);
 
         private:
-
             //! parent
             WindowManager *_parent;
-
         };
 
         //! application event filter
@@ -291,9 +278,7 @@ namespace Vanish
 
         //! allow access of all private members to the app event filter
         friend class AppEventFilter;
-
     };
-
 }
 
-#endif
+#endif // WINDOWMANAGER_H

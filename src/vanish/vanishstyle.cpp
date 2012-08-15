@@ -1,27 +1,35 @@
-/*
-  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
-
-  ----
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public
-  License version 2 as published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; see the file COPYING.  If not, write to
-  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  Boston, MA 02110-1301, USA.
-*/
+/****************************************************************************
+ * This file is part of Vanish.
+ *
+ * Copyright (c) 2011-2012 Pier Luigi Fiorini
+ * Copyright (c) 2007-2010 Craig Drummond
+ *
+ * Author(s):
+ *    Craig Drummond <craig.p.drummond@gmail.com>
+ *    Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ *
+ * $BEGIN_LICENSE:LGPL$
+ *
+ * Vanish is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * Vanish is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Vanish.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * $END_LICENSE$
+ ***************************************************************************/
 
 #include <iostream>
 
 #include <QtWidgets>
-#include <QtPrintSupport/QPrintDialog>
+#include <QPrintDialog>
 
 #include "vanishstyle.h"
 #include "windowmanager.h"
@@ -698,14 +706,14 @@ namespace Vanish
           , itsName(name)
 #endif
     {
-        const char *env = getenv(QTCURVE_PREVIEW_CONFIG);
-        if (env && 0 == strcmp(env, QTCURVE_PREVIEW_CONFIG)) {
-            // To enable preview of Vanish settings, the style config module will set QTCURVE_PREVIEW_CONFIG
+        const char *env = getenv(VANISH_PREVIEW_CONFIG);
+        if (env && 0 == strcmp(env, VANISH_PREVIEW_CONFIG)) {
+            // To enable preview of Vanish settings, the style config module will set VANISH_PREVIEW_CONFIG
             // and use CE_QtC_SetOptions to set options. If this is set, we do not use the QPixmapCache as it
             // will interfere with that of the kcm's widgets!
             itsIsPreview = PREVIEW_MDI;
             itsUsePixmapCache = false;
-        } else if (env && 0 == strcmp(env, QTCURVE_PREVIEW_CONFIG_FULL)) {
+        } else if (env && 0 == strcmp(env, VANISH_PREVIEW_CONFIG_FULL)) {
             // As above, but preview is in window - so can use opacity settings!
             itsIsPreview = PREVIEW_WINDOW;
             itsUsePixmapCache = false;
@@ -1056,7 +1064,7 @@ namespace Vanish
         else if ("Kde4ToolkitLibrary" == appName)
             theThemedApp = APP_OPERA;
 
-        if (NULL != getenv("QTCURVE_DEBUG")) {
+        if (NULL != getenv("VANISH_DEBUG")) {
             QByteArray l1(appName.toLatin1());
             std::cout << "Vanish: Application name: \"" << l1.constData() << "\"\n";
         }

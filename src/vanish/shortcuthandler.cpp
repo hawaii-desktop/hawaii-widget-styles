@@ -1,29 +1,37 @@
-/*
-  Vanish (C) Craig Drummond, 2007 - 2010 craig.p.drummond@gmail.com
+/****************************************************************************
+ * This file is part of Vanish.
+ *
+ * Copyright (c) 2011-2012 Pier Luigi Fiorini
+ * Copyright (c) 2007-2010 Craig Drummond
+ *
+ * Author(s):
+ *    Craig Drummond <craig.p.drummond@gmail.com>
+ *    Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ *
+ * $BEGIN_LICENSE:LGPL$
+ *
+ * Vanish is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * Vanish is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Vanish.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * $END_LICENSE$
+ ***************************************************************************/
 
-  ----
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public
-  License version 2 as published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; see the file COPYING.  If not, write to
-  the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-  Boston, MA 02110-1301, USA.
-*/
+#include <QtWidgets>
 
 #include "shortcuthandler.h"
-#include <QtWidgets>
 
 namespace Vanish
 {
-
     ShortcutHandler::ShortcutHandler(QObject *parent)
         : QObject(parent)
         , itsAltDown(false)
@@ -163,5 +171,4 @@ namespace Vanish
         }
         return QObject::eventFilter(o, e);
     }
-
 }
