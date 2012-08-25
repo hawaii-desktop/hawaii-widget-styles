@@ -34,6 +34,7 @@
 #include "common.h"
 #include "utils.h"
 
+#include <QtGui/QWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
@@ -71,11 +72,9 @@ namespace Vanish
         _locked(false),
         _cursorOverride(false)
     {
-
         // install application wise event filter
         _appEventFilter = new AppEventFilter(this);
         qApp->installEventFilter(_appEventFilter);
-
     }
 
     //_____________________________________________________________
@@ -271,8 +270,9 @@ namespace Vanish
         } else {
             // use QWidget::move for the grabbing
             /* this works only if the sending object and the target are identical */
-            QWidget *window(_target.data()->window());
-            window->move(window->pos() + mouseEvent->pos() - _dragPoint);
+            QWidget *widget(_target.data()->window());
+            QWindow *window = widget->windowHandle();
+            window->setPos(mouseEvent->globalPos() - _dragPoint);
         }
 
         return true;
