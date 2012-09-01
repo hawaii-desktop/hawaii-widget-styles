@@ -31,6 +31,8 @@
 #include <QtWidgets>
 #include <QPrintDialog>
 
+#include <VSettings>
+
 #include "vanishstyle.h"
 #include "windowmanager.h"
 #include "blurhelper.h"
@@ -701,6 +703,7 @@ namespace Vanish
 #ifdef QTC_STYLE_SUPPORT
           , itsName(name)
 #endif
+          , m_settings(new VSettings("org.maui.desktop.interface"))
     {
         const char *env = getenv(VANISH_PREVIEW_CONFIG);
         if (env && 0 == strcmp(env, VANISH_PREVIEW_CONFIG)) {
@@ -960,6 +963,8 @@ namespace Vanish
     Style::~Style()
     {
         freeColors();
+
+        delete m_settings;
     }
 
     void Style::freeColor(QSet<QColor *> &freedColors, QColor **cols)
@@ -2373,14 +2378,14 @@ namespace Vanish
                 return 2;
             case PM_ToolBarExtensionExtent:
                 return int(dpiScaled(15));
-                // TODO: Size from settings
             case PM_SmallIconSize:
-                return int(dpiScaled(16));
-            case PM_ToolBarIconSize:
-                return int(dpiScaled(22));
-            case PM_IconViewIconSize:
+                return int(dpiScaled(m_settings->value("small-icon-size").toInt()));
             case PM_LargeIconSize:
-                return int(dpiScaled(32));
+                return int(dpiScaled(m_settings->value("large-icon-size").toInt()));
+            case PM_ButtonIconSize:
+                return int(dpiScaled(m_settings->value("button-icon-size").toInt()));
+            case PM_IconViewIconSize:
+                return int(dpiScaled(m_settings->value("iconview-icon-size").toInt()));
             case PM_SubMenuOverlap:
                 return -2;
             case PM_ScrollView_ScrollBarSpacing:

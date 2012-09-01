@@ -53,6 +53,7 @@ class QDBusInterface;
 class QMainWindow;
 class QStatusBar;
 class QAbstractScrollArea;
+class VSettings;
 
 namespace Vanish
 {
@@ -326,6 +327,7 @@ namespace Vanish
 #ifdef QTC_STYLE_SUPPORT
         QString                            itsName;
 #endif
+        VSettings *m_settings;
     };
 }
 
