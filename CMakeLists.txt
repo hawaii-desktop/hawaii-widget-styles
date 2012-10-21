@@ -10,7 +10,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 # Installation directories
-include(MauiInstallDirs)
+include(HawaiiInstallDirs)
 
 # Make CPack available to easy generate binary packages
 include(CPack)
@@ -49,6 +49,12 @@ endif()
 find_package(VibeCore REQUIRED)
 if(NOT VibeCore_FOUND)
     message(FATAL_ERROR "VibeCore module is required!")
+endif()
+
+# Find Fluid libraries
+find_package(Fluid REQUIRED)
+if(NOT Fluid_FOUND)
+    message(FATAL_ERROR "Fluid module is required!")
 endif()
 
 # Subdirectories
