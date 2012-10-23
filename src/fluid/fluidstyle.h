@@ -25,11 +25,11 @@
 #ifndef FLUIDSTYLE_H
 #define FLUIDSTYLE_H
 
-#include <QPlastiqueStyle>
+#include <QFusionStyle>
 
 class PushButton;
 
-class FluidStyle : public QPlastiqueStyle
+class FluidStyle : public QFusionStyle
 {
     Q_OBJECT
 public:

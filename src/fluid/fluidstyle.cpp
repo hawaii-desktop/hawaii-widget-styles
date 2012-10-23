@@ -57,7 +57,7 @@ static QPolygon rotate(const QPolygon &p, double angle)
 
 
 FluidStyle::FluidStyle()
-    : QPlastiqueStyle()
+    : QFusionStyle()
 {
     m_pushButton = new PushButton(this);
 }
@@ -69,7 +69,7 @@ FluidStyle::~FluidStyle()
 
 void FluidStyle::polish(QWidget *widget)
 {
-    QPlastiqueStyle::polish(widget);
+    QFusionStyle::polish(widget);
 
     if (qobject_cast<QPushButton *>(widget) ||
             qobject_cast<QAbstractButton *>(widget) ||
@@ -114,7 +114,7 @@ void FluidStyle::unpolish(QWidget *widget)
             widget->inherits("QDockWidgetSeparator"))
         widget->setAttribute(Qt::WA_Hover, false);
 
-    QPlastiqueStyle::unpolish(widget);
+    QFusionStyle::unpolish(widget);
 }
 
 void FluidStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -307,7 +307,7 @@ void FluidStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opt
         //case PE_PanelMenuBar
         //case PE_PanelScrollAreaCorner
         default:
-            QPlastiqueStyle::drawPrimitive(element, option, painter, widget);
+            QFusionStyle::drawPrimitive(element, option, painter, widget);
     }
 
     painter->restore();
@@ -407,7 +407,7 @@ void FluidStyle::drawControl(ControlElement element, const QStyleOption *option,
             break;
 #endif
         default:
-            QPlastiqueStyle::drawControl(element, option, painter, widget);
+            QFusionStyle::drawControl(element, option, painter, widget);
     }
 
     painter->restore();
@@ -415,7 +415,7 @@ void FluidStyle::drawControl(ControlElement element, const QStyleOption *option,
 
 QSize FluidStyle::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
-    QSize newSize(QPlastiqueStyle::sizeFromContents(type, option, size, widget));
+    QSize newSize(QFusionStyle::sizeFromContents(type, option, size, widget));
 
     switch (type) {
         case CT_PushButton: {
