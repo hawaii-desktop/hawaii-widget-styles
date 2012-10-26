@@ -1,7 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/">
-	<file>themes/Default.vanish</file>
-	<file>themes/Altro.vanish</file>
-        <file>themes/DefaultMenuBackground.png</file>
-</qresource>
-</RCC>
