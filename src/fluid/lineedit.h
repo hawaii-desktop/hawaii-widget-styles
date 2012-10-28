@@ -24,38 +24,22 @@
  * $END_LICENSE$
  ***************************************************************************/
 
-#ifndef FLUIDSTYLE_H
-#define FLUIDSTYLE_H
+#ifndef LINEEDIT_H
+#define LINEEDIT_H
 
-#include <QFusionStyle>
+#include <Fluid/FrameSvg>
 
-class LineEdit;
-class PushButton;
-class ScrollBars;
-
-class FluidStyle : public QFusionStyle
+class LineEdit : public QObject
 {
     Q_OBJECT
 public:
-    FluidStyle();
-    ~FluidStyle();
+    LineEdit(QObject *parent = 0);
+    ~LineEdit();
 
-    void polish(QWidget *widget);
-    void unpolish(QWidget *widget);
-
-    void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const;
-    void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const;
-
-    QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget = 0) const;
-
-#if 0
-    QPalette standardPalette() const;
-#endif
+    void paint(const QStyleOption *option, QPainter *painter, const QWidget *widget = 0);
 
 private:
-    LineEdit *m_lineEdit;
-    PushButton *m_pushButton;
-    ScrollBars *m_scrollBars;
+    Fluid::FrameSvg *m_svgImage;
 };
 
-#endif // FLUIDSTYLE_H
+#endif // LINEEDIT_H

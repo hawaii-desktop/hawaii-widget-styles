@@ -11,7 +11,9 @@ add_definitions(
 set(SOURCES
     main.cpp
     fluidstyle.cpp
+    lineedit.cpp
     pushbutton.cpp
+    scrollbars.cpp
 )
 
 add_library(fluid SHARED ${SOURCES})

@@ -24,38 +24,41 @@
  * $END_LICENSE$
  ***************************************************************************/
 
-#ifndef FLUIDSTYLE_H
-#define FLUIDSTYLE_H
+#include <QDebug>
+#include <QStyle>
+#include <QStyleOption>
+#include <QPainter>
 
-#include <QFusionStyle>
+#include "lineedit.h"
 
-class LineEdit;
-class PushButton;
-class ScrollBars;
+using namespace Fluid;
 
-class FluidStyle : public QFusionStyle
+LineEdit::LineEdit(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-public:
-    FluidStyle();
-    ~FluidStyle();
+    m_svgImage = new FrameSvg(this);
+    m_svgImage->setImagePath("widgets/lineedit");
+    m_svgImage->setCacheAllRenderedFrames(true);
+}
 
-    void polish(QWidget *widget);
-    void unpolish(QWidget *widget);
+LineEdit::~LineEdit()
+{
+    delete m_svgImage;
+}
 
-    void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const;
-    void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const;
+void LineEdit::paint(const QStyleOption *option, QPainter *painter, const QWidget *widget)
+{
+    bool hasFocus = option->state & QStyle::State_HasFocus;
+    bool isOver = option->state & QStyle::State_MouseOver;
 
-    QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget = 0) const;
+    if (hasFocus)
+        m_svgImage->setElementPrefix("focus");
+    else if (isOver)
+        m_svgImage->setElementPrefix("hover");
+    else
+        m_svgImage->setElementPrefix("base");
+    m_svgImage->resizeFrame(option->rect.size());
+    m_svgImage->paintFrame(painter, option->rect);
+}
 
-#if 0
-    QPalette standardPalette() const;
-#endif
-
-private:
-    LineEdit *m_lineEdit;
-    PushButton *m_pushButton;
-    ScrollBars *m_scrollBars;
-};
-
-#endif // FLUIDSTYLE_H
+#include "moc_lineedit.cpp"

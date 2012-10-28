@@ -6,18 +6,20 @@
  * Author(s):
  *    Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  *
- * $BEGIN_LICENSE:LGPL-ONLY$
+ * $BEGIN_LICENSE:LGPL2.1+$
  *
- * This file may be used under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation and
- * appearing in the file LICENSE.LGPL included in the packaging of
- * this file, either version 2.1 of the License, or (at your option) any
- * later version.  Please review the following information to ensure the
- * GNU Lesser General Public License version 2.1 requirements
- * will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 2.1 of the License, or
+ * (at your option) any later version.
  *
- * If you have questions regarding the use of this file, please contact
- * us via http://www.maui-project.org/.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * $END_LICENSE$
  ***************************************************************************/
@@ -44,27 +46,25 @@
 #include <Fluid/FrameSvg>
 
 #include "fluidstyle.h"
+#include "lineedit.h"
 #include "pushbutton.h"
+#include "scrollbars.h"
 
 using namespace Fluid;
-
-static QPolygon rotate(const QPolygon &p, double angle)
-{
-    QMatrix matrix;
-    matrix.rotate(angle);
-    return matrix.map(p);
-}
-
 
 FluidStyle::FluidStyle()
     : QFusionStyle()
 {
+    m_lineEdit = new LineEdit(this);
     m_pushButton = new PushButton(this);
+    m_scrollBars = new ScrollBars(this);
 }
 
 FluidStyle::~FluidStyle()
 {
+    delete m_scrollBars;
     delete m_pushButton;
+    delete m_lineEdit;
 }
 
 void FluidStyle::polish(QWidget *widget)
@@ -152,11 +152,6 @@ void FluidStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opt
 
         }
         break;
-
-
-
-
-
         //case PE_FrameStatusBar
         case PE_PanelButtonCommand:
             m_pushButton->paint(option, painter, widget);
@@ -178,23 +173,10 @@ void FluidStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opt
             item.paintFrame(painter, option->rect);
         }
         break;
-        case PE_FrameLineEdit: {
-            FrameSvg *item = new FrameSvg();
-
-            item->setImagePath("widgets/lineedit");
-            item->resizeFrame(option->rect.size());
-            if (option->state & State_HasFocus)
-                item->setElementPrefix("focus");
-            else if (option->state & State_MouseOver)
-                item->setElementPrefix("hover");
-            else
-                item->setElementPrefix("base");
-            item->paintFrame(painter, option->rect);
-
-            delete item;
-        }
-        break;
-        //case PE_PanelLineEdit
+        case PE_FrameLineEdit:
+            m_lineEdit->paint(option, painter, widget);
+            break;
+            //case PE_PanelLineEdit
         case PE_IndicatorButtonDropDown:
             FluidStyle::drawPrimitive(PE_IndicatorArrowDown, option, painter, widget);
             break;
@@ -202,67 +184,14 @@ void FluidStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opt
         case PE_IndicatorArrowUp:
         case PE_IndicatorArrowDown:
         case PE_IndicatorArrowRight:
-        case PE_IndicatorArrowLeft: {
-#if 0
-            Svg svg;
-            svg.setUsingRenderingCache(true);
-            svg.setImagePath("widgets/scrollbar");
-            svg.resize(option->rect.size());
-
-            QString elementId;
-            switch (element) {
-                case PE_IndicatorArrowUp:
-                    elementId = "arrow-up";
-                    break;
-                case PE_IndicatorArrowDown:
-                    elementId = "arrow-down";
-                    break;
-                case PE_IndicatorArrowRight:
-                    elementId = "arrow-right";
-                    break;
-                case PE_IndicatorArrowLeft:
-                    elementId = "arrow-left";
-                    break;
-                default:
-                    break;
-            }
-            svg.paint(painter, QPointF(0, 0), elementId);
-#else
-            QPolygon a;
-            QRect r(option->rect);
-            int          m = 0;
-            a.setPoints(3,  3 + m, 1 + m,  0, -2,  -(3 + m), 1 + m,    -(3 + m), 2 + m,  -(2 + m), 2 + m, 0, 0,  2 + m, 2 + m, 3 + m, 2 + m);
-            switch (element) {
-                case PE_IndicatorArrowUp:
-                    if (m)
-                        r.adjust(0, -m, 0, -m);
-                    break;
-                case PE_IndicatorArrowDown:
-                    if (m)
-                        r.adjust(0, m, 0, m);
-                    a = rotate(a, 180);
-                    break;
-                case PE_IndicatorArrowRight:
-                    a = rotate(a, 90);
-                    break;
-                case PE_IndicatorArrowLeft:
-                    a = rotate(a, 270);
-                    break;
-                default:
-                    return;
-            }
-
-            a.translate((r.x() + (r.width() >> 1)), (r.y() + (r.height() >> 1)));
-
-            painter->drawPolygon(a);
-#endif
-        }
-        break;
-        //case PE_IndicatorSpinUp
-        //case PE_IndicatorSpinDown
-        //case PE_IndicatorSpinPlus
-        //case PE_IndicatorSpinMinus
-        //case PE_IndicatorItemViewItemCheck
+        case PE_IndicatorArrowLeft:
+            m_scrollBars->paintArrow(element, option, painter, widget);
+            break;
+            //case PE_IndicatorSpinUp
+            //case PE_IndicatorSpinDown
+            //case PE_IndicatorSpinPlus
+            //case PE_IndicatorSpinMinus
+            //case PE_IndicatorItemViewItemCheck
         case PE_IndicatorCheckBox: {
             Svg *svg = new Svg();
 
@@ -355,9 +284,6 @@ QSize FluidStyle::sizeFromContents(ContentsType type, const QStyleOption *option
 
                 if (btn->features & QStyleOptionButton::HasMenu)
                     newSize += QSize(4, 0);
-
-                if (!btn->text.isEmpty() && "..." != btn->text && newSize.width() < 80)
-                    newSize.setWidth(80);
 
                 newSize.rheight() += ((1 - newSize.rheight()) & 1);
             }
