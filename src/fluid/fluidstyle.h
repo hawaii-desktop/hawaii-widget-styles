@@ -27,7 +27,7 @@
 #ifndef FLUIDSTYLE_H
 #define FLUIDSTYLE_H
 
-#include <QFusionStyle>
+#include <private/qfusionstyle_p.h>
 
 class LineEdit;
 class PushButton;

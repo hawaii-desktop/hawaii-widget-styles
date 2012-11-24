@@ -1,5 +1,6 @@
 include_directories(
     ${Qt5Widgets_INCLUDE_DIRS}
+    ${Qt5Widgets_PRIVATE_INCLUDE_DIRS}
     ${Fluid_INCLUDE_DIRS}
 )
 
