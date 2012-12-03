@@ -6,14 +6,14 @@ cmake_minimum_required(VERSION 2.8.7)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Our CMake modules
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+# Set version
+set(WIDGETSTYLES_VERSION_MAJOR 0)
+set(WIDGETSTYLES_VERSION_MINOR 0)
+set(WIDGETSTYLES_VERSION_PATCH 0)
+set(WIDGETSTYLES_VERSION_STRING "${WIDGETSTYLES_VERSION_MAJOR}.${WIDGETSTYLES_VERSION_MINOR}.${WIDGETSTYLES_VERSION_PATCH}")
 
 # Installation directories
 include(HawaiiInstallDirs)
-
-# Make CPack available to easy generate binary packages
-include(CPack)
 
 # Add custom uninstall target
 configure_file(
@@ -21,6 +21,14 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY)
 add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
+# Set up packaging
+set(CPACK_PACKAGE_NAME hawaii-widget-styles)
+set(CPACK_PACKAGE_VERSION ${WIDGETSTYLES_VERSION_STRING})
+set(CPACK_SYSTEM_NAME "generic")
+set(CPACK_GENERATOR "TGZ")
+set(CPACK_SET_DESTDIR FALSE)
+include(CPack)
 
 # Build flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -std=c++0x")
