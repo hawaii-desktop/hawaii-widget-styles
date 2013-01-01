@@ -1,12 +1,12 @@
 /****************************************************************************
  * This file is part of Widget Styles.
  *
- * Copyright (c) 2008 Aaron Seigo
- * Copyright (c) 2012 Pier Luigi Fiorini
+ * Copyright (C) 2012-2013 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2008 Aaron Seigo <aseigo@kde.org>
  *
  * Author(s):
- *    Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
- *    Aaron Seigo <aseigo@kde.org>
+ *    Pier Luigi Fiorini
+ *    Aaron Seigo
  *
  * $BEGIN_LICENSE:LGPL2.1+$
  *
