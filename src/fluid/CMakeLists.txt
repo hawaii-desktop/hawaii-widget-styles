@@ -1,13 +1,9 @@
 include_directories(
-    ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Widgets_PRIVATE_INCLUDE_DIRS}
     ${Fluid_INCLUDE_DIRS}
 )
 
-add_definitions(
-    ${Qt5Widgets_DEFINITIONS}
-    -DQT_PLUGIN
-)
+add_definitions(-DQT_PLUGIN)
 
 set(SOURCES
     main.cpp
@@ -18,10 +14,9 @@ set(SOURCES
 )
 
 add_library(fluid SHARED ${SOURCES})
+qt5_use_modules(fluid Widgets)
 set_target_properties(fluid PROPERTIES PREFIX "")
-target_link_libraries(fluid
-    ${Qt5Widgets_LIBRARIES}
-    ${Fluid_LIBRARIES}
-)
+target_link_libraries(fluid ${Fluid_LIBRARIES})
 
-install(TARGETS fluid LIBRARY DESTINATION ${CMAKE_INSTALL_PLUGINSDIR}/styles)
+install(TARGETS fluid LIBRARY
+    DESTINATION ${CMAKE_INSTALL_PLUGINSDIR}/styles)
