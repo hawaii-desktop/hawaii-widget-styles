@@ -1,7 +1,7 @@
 /****************************************************************************
- * This file is part of Widget Styles.
+ * This file is part of Hawaii Widget Styles.
  *
- * Copyright (C) 2012-2013 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2013 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  *
  * Author(s):
  *    Pier Luigi Fiorini
@@ -24,24 +24,31 @@
  * $END_LICENSE$
  ***************************************************************************/
 
-#ifndef SCROLLBARS_H
-#define SCROLLBARS_H
+import QtQuick 2.1
+import QtQuick.Controls 1.0
+import QtQuick.Controls.Styles 1.0
 
-#include <Fluid/Svg>
+ProgressBarStyle {
+    id: progressBarStyle
 
-class ScrollBars : public QObject
-{
-    Q_OBJECT
-public:
-    ScrollBars(QObject *parent = 0);
-    ~ScrollBars();
+    panel: Rectangle {
+        implicitHeight: 15
+        implicitWidth: 400
+        radius: 6
+        color: "#f7f7f7"
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#f5f5f5"; }
+            GradientStop { position: 1.0; color: "#f9f9f9"; }
+        }
+        antialiasing: true
+        opacity: 0.8
 
-    void paintArrow(QStyle::PrimitiveElement element,
-                    const QStyleOption *option, QPainter *painter,
-                    const QWidget *widget = 0);
-
-private:
-    Fluid::Svg *m_svgImage;
-};
-
-#endif // SCROLLBARS_H
+        Rectangle {
+            width: parent.width * control.value / control.maximumValue
+            height: parent.height
+            radius: 6
+            color: "#468bb7"
+            antialiasing: true
+        }
+    }
+}
