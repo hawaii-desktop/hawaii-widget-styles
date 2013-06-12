@@ -37,20 +37,21 @@ ToolBarStyle {
                         SystemPalette.Active : SystemPalette.Disabled
     }
 
-    panel: Image {
-        source: "images/noise-texture.png"
-        sourceSize: Qt.size(100, 100)
-
-        Rectangle {
-            anchors.fill: parent
-            gradient: Gradient {
+    panel: Rectangle {
+        gradient: Gradient {
 /*
-                GradientStop { position: 0; color: Qt.lighter(__syspal.window, 1.2) }
-                GradientStop { position: 1; color: Qt.darker(__syspal.window, 1.2) }
+            GradientStop { position: 0; color: Qt.lighter(__syspal.window, 1.2) }
+            GradientStop { position: 1; color: Qt.darker(__syspal.window, 1.2) }
 */
-                GradientStop { position: 0; color: "#80eeeeee" }
-                GradientStop { position: 1; color: "#80cccccc" }
-            }
+            GradientStop { position: 0; color: "#eee" }
+            GradientStop { position: 1; color: "#aaa" }
+        }
+
+        Image {
+            anchors.fill: parent
+            source: "images/noise-texture.png"
+            sourceSize: Qt.size(100, 100)
+            fillMode: Image.TileHorizontally
 
             Rectangle {
                 anchors.bottom: parent.bottom
