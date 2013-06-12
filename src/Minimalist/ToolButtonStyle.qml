@@ -27,6 +27,69 @@
 import QtQuick 2.1
 import QtQuick.Controls 1.0
 import QtQuick.Controls.Styles 1.0
+import QtGraphicalEffects 1.0
 
 ToolButtonStyle {
+    panel: Item {
+        implicitWidth: 36
+        implicitHeight: 36
+
+        Rectangle {
+            id: mainItem
+            anchors.fill: parent
+            border.color: "#999"
+            radius: 6
+            antialiasing: true
+            visible: false
+
+            Rectangle {
+                anchors.fill: parent
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#f7f7f7" }
+                    GradientStop { position: 1.0; color: "#aaa" }
+                }
+                radius: 6
+                antialiasing: true
+                visible: !control.pressed
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#dedede"; }
+                    GradientStop { position: 0.38; color: "#ededed"; }
+                    GradientStop { position: 1.0; color: "#ededed"; }
+                }
+                radius: 6
+                antialiasing: true
+                visible: control.pressed
+            }
+
+            Image {
+                id: icon
+                anchors.centerIn: parent
+                source: control.iconSource
+                sourceSize: Qt.size(24, 24)
+            }
+
+            Text {
+                id: label
+                anchors.centerIn: parent
+                text: control.text
+                visible: icon.status != Image.Ready
+            }
+        }
+
+        DropShadow {
+            anchors.fill: mainItem
+            horizontalOffset: 0
+            verticalOffset: 1
+            radius: 4
+            samples: 16
+            spread: 0
+            color: "#40000000"
+            source: mainItem
+            transparentBorder: true
+        }
+    }
 }
