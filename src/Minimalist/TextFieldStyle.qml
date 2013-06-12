@@ -63,8 +63,9 @@ TextFieldStyle {
                         margins: 2
                     }
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: "#f1f1f1"; }
-                        GradientStop { position: 1.0; color: "#ffffff"; }
+                        GradientStop { position: 0.0; color: Qt.darker(__syspal.base, 1.2) }
+                        GradientStop { position: 0.5; color: Qt.darker(__syspal.base, 1.1) }
+                        GradientStop { position: 1.0; color: __syspal.base }
                     }
                 }
             }
