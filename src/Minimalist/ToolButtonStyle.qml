@@ -68,8 +68,20 @@ ToolButtonStyle {
             Image {
                 id: icon
                 anchors.centerIn: parent
-                source: control.iconSource
-                sourceSize: Qt.size(24, 24)
+                source: {
+                    if (control.__action) {
+                        if (control.__action.iconName)
+                            return "image://desktoptheme/" + control.__action.iconName;
+                        return control.__action.iconSource;
+                    }
+                    return control.iconSource;
+                }
+                sourceSize {
+                    width: 24
+                    height: 24
+                }
+                width: 24
+                height: 24
             }
 
             Text {
