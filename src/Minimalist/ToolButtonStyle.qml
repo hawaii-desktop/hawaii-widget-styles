@@ -40,7 +40,7 @@ ToolButtonStyle {
             border.color: "#999"
             radius: 6
             antialiasing: true
-            visible: false
+            visible: true
 
             Rectangle {
                 anchors.fill: parent
@@ -102,6 +102,7 @@ ToolButtonStyle {
             color: "#40000000"
             source: mainItem
             transparentBorder: true
+            visible: false
         }
     }
 }
