@@ -1,4 +1,4 @@
-module QtQuick.Controls.Styles.Minimalist
+module QtQuick.Controls.Styles.Aluminium
 
 ButtonStyle 1.0 ButtonStyle.qml
 CheckBoxStyle 1.0 CheckBoxStyle.qml

@@ -1,4 +1,4 @@
-TARGETPATH = QtQuick/Controls/Styles/Minimalist
+TARGETPATH = QtQuick/Controls/Styles/Aluminium
 
 QML_FILES = \
     ButtonStyle.qml \
