@@ -102,11 +102,13 @@ ButtonStyle {
 
             DropShadow {
                 anchors.fill: mainItem
-                horizontalOffset: 0
+                horizontalOffset: 1
                 verticalOffset: 1
                 radius: 8
                 samples: 16
                 spread: 0
+                fast: true
+                transparentBorder: true
                 color: "#40000000"
                 source: mainItem
             }
