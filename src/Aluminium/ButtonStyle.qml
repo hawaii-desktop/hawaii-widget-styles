@@ -33,6 +33,14 @@ ButtonStyle {
     id: buttonStyle
 
     property int radii: 5
+    property int margin: 10
+
+    padding {
+        top: margin
+        left: margin
+        right: margin
+        bottom: margin
+    }
 
     label: Text {
         renderType: Text.NativeRendering
@@ -46,7 +54,7 @@ ButtonStyle {
 
     background: Item {
         implicitWidth: 100
-        implicitHeight: 35
+        implicitHeight: 30
 
         Rectangle {
             anchors.fill: parent
