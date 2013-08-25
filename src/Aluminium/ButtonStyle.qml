@@ -44,7 +44,7 @@ ButtonStyle {
 
     background: Item {
         implicitWidth: 100
-        implicitHeight: 25
+        implicitHeight: 35
 
         Rectangle {
             anchors.fill: parent
