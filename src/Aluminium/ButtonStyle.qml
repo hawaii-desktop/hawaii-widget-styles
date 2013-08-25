@@ -34,6 +34,8 @@ ButtonStyle {
 
     property int radii: 5
     property int margin: 10
+    property color bgColor: "#eeeeee"
+    property color buttonColor: Qt.lighter(bgColor, 1.02)
 
     padding {
         top: margin
@@ -84,9 +86,9 @@ ButtonStyle {
                     }
                     radius: radii
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: "#dedede"; }
-                        GradientStop { position: 0.38; color: "#ededed"; }
-                        GradientStop { position: 1.0; color: "#ededed"; }
+                        GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 0.95); }
+                        GradientStop { position: 0.5; color: buttonColor; }
+                        GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 1.08); }
                     }
                     opacity: control.pressed ? 1.0 : 0.0
 
@@ -100,9 +102,9 @@ ButtonStyle {
                     }
                     radius: radii
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: "#ededed"; }
-                        GradientStop { position: 0.38; color: "#ededed"; }
-                        GradientStop { position: 1.0; color: "#dedede"; }
+                        GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 1.08); }
+                        GradientStop { position: 0.5; color: buttonColor; }
+                        GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 0.95); }
                     }
                     opacity: !control.pressed ? 1.0 : 0.0
 
