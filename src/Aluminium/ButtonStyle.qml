@@ -32,6 +32,8 @@ import QtGraphicalEffects 1.0
 ButtonStyle {
     id: buttonStyle
 
+    property int radii: 5
+
     label: Text {
         renderType: Text.NativeRendering
         verticalAlignment: Text.AlignVCenter
@@ -53,7 +55,7 @@ ButtonStyle {
                 width: 2
                 color: control.activeFocus ? "#401094ff" : "transparent"
             }
-            radius: 6
+            radius: radii
             antialiasing: true
 
             Rectangle {
@@ -63,7 +65,7 @@ ButtonStyle {
                     margins: 2
                 }
                 border.color: "#40000000"
-                radius: 6
+                radius: radii
                 antialiasing: true
                 visible: false
 
@@ -72,7 +74,7 @@ ButtonStyle {
                         fill: parent
                         margins: 1
                     }
-                    radius: 6
+                    radius: radii
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: "#dedede"; }
                         GradientStop { position: 0.38; color: "#ededed"; }
@@ -88,7 +90,7 @@ ButtonStyle {
                         fill: parent
                         margins: 1
                     }
-                    radius: 6
+                    radius: radii
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: "#ededed"; }
                         GradientStop { position: 0.38; color: "#ededed"; }
