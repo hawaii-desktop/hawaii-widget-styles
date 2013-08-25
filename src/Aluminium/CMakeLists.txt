@@ -17,10 +17,16 @@ set(FILES
     TextFieldStyle.qml
     ToolBarStyle.qml
     ToolButtonStyle.qml
-    images/progress-indeterminate.png
-    images/noise-texture.png
     qmldir
 )
 
 install(FILES ${FILES}
         DESTINATION ${QT_IMPORTS_DIR}/QtQuick/Controls/Styles/Aluminium)
+
+set(IMAGES
+    images/progress-indeterminate.png
+    images/noise-texture.png
+)
+
+install(FILES ${IMAGES}
+        DESTINATION ${QT_IMPORTS_DIR}/QtQuick/Controls/Styles/Aluminium/images)
