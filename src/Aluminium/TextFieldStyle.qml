@@ -33,9 +33,10 @@ TextFieldStyle {
     id: textFieldStyle
 
     property int radii: 5
+    property color bgColor: "#eeeeee"
 
     background: Item {
-        implicitWidth: 100
+        implicitWidth: 300
         implicitHeight: 30
 
         Rectangle {
@@ -65,9 +66,9 @@ TextFieldStyle {
                         margins: 2
                     }
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.darker(__syspal.base, 1.2) }
-                        GradientStop { position: 0.5; color: Qt.darker(__syspal.base, 1.1) }
-                        GradientStop { position: 1.0; color: __syspal.base }
+                        GradientStop { position: 0.0; color: Qt.lighter(bgColor, 0.94); }
+                        GradientStop { position: 0.5; color: Qt.lighter(bgColor, 0.98); }
+                        GradientStop { position: 1.0; color: bgColor; }
                     }
                 }
             }
