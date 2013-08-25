@@ -36,7 +36,7 @@ TextFieldStyle {
     property color bgColor: "#eeeeee"
 
     background: Item {
-        implicitWidth: 300
+        implicitWidth: 100
         implicitHeight: 30
 
         Rectangle {
@@ -67,20 +67,22 @@ TextFieldStyle {
                     }
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: Qt.lighter(bgColor, 0.94); }
-                        GradientStop { position: 0.5; color: Qt.lighter(bgColor, 0.98); }
-                        GradientStop { position: 1.0; color: bgColor; }
+                        GradientStop { position: 0.25; color: bgColor; }
+                        GradientStop { position: 1.0; color: Qt.lighter(bgColor, 1.25); }
                     }
                 }
             }
 
             DropShadow {
                 anchors.fill: mainItem
-                horizontalOffset: 0
+                horizontalOffset: 1
                 verticalOffset: 1
                 radius: 8
                 samples: 16
                 spread: 0
-                color: "#40000000"
+                fast: true
+                transparentBorder: true
+                color: "#809f9f9f"
                 source: mainItem
             }
         }
