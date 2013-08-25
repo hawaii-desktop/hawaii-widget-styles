@@ -52,7 +52,7 @@ ButtonStyle {
         text: control.text
         color: fgColor
         style: Text.Raised
-        styleColor: "white"
+        styleColor: Qt.lighter(buttonColor, 1.25)
     }
 
     background: Item {
