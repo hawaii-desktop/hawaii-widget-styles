@@ -32,6 +32,8 @@ import QtGraphicalEffects 1.0
 TextFieldStyle {
     id: textFieldStyle
 
+    property int radii: 5
+
     background: Item {
         implicitWidth: 100
         implicitHeight: 30
@@ -43,7 +45,7 @@ TextFieldStyle {
                 width: 2
                 color: control.activeFocus ? "#401094ff" : "transparent"
             }
-            radius: 6
+            radius: radii
             antialiasing: true
 
             Rectangle {
@@ -53,7 +55,7 @@ TextFieldStyle {
                     margins: 2
                 }
                 border.color: "#40000000"
-                radius: 6
+                radius: radii
                 antialiasing: true
                 visible: false
 
