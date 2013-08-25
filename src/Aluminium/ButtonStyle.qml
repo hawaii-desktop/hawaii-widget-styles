@@ -92,7 +92,7 @@ ButtonStyle {
                     }
                     opacity: control.pressed ? 1.0 : 0.0
 
-                    Behavior on opacity { PropertyAnimation { duration: 50 } }
+                    Behavior on opacity { NumberAnimation { easing.type: Easing.OutSine; duration: 75 } }
                 }
 
                 Rectangle {
@@ -108,7 +108,7 @@ ButtonStyle {
                     }
                     opacity: !control.pressed ? 1.0 : 0.0
 
-                    Behavior on opacity { PropertyAnimation { duration: 50 } }
+                    Behavior on opacity { NumberAnimation { easing.type: Easing.OutSine; duration: 75 } }
                 }
             }
 
