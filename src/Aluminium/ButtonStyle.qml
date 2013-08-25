@@ -80,7 +80,7 @@ ButtonStyle {
                     }
                     opacity: control.pressed ? 1.0 : 0.0
 
-                    Behavior on opacity { PropertyAnimation { duration: 100 } }
+                    Behavior on opacity { PropertyAnimation { duration: 50 } }
                 }
 
                 Rectangle {
@@ -96,7 +96,7 @@ ButtonStyle {
                     }
                     opacity: !control.pressed ? 1.0 : 0.0
 
-                    Behavior on opacity { PropertyAnimation { duration: 100 } }
+                    Behavior on opacity { PropertyAnimation { duration: 50 } }
                 }
             }
 
