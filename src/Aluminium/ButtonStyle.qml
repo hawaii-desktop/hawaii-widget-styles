@@ -63,7 +63,7 @@ ButtonStyle {
             anchors.fill: parent
             color: "transparent"
             border {
-                width: 2
+                width: 4
                 color: control.activeFocus ? "#401094ff" : "transparent"
             }
             radius: radii
