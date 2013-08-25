@@ -34,6 +34,7 @@ ButtonStyle {
 
     property int radii: 5
     property int margin: 10
+    property color fgColor: "#333333"
     property color bgColor: "#eeeeee"
     property color buttonColor: Qt.lighter(bgColor, 1.02)
 
@@ -49,7 +50,7 @@ ButtonStyle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         text: control.text
-        color: __syspal.text
+        color: fgColor
         style: Text.Raised
         styleColor: "white"
     }
