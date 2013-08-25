@@ -34,7 +34,7 @@ TextFieldStyle {
 
     background: Item {
         implicitWidth: 100
-        implicitHeight: 25
+        implicitHeight: 30
 
         Rectangle {
             anchors.fill: parent
