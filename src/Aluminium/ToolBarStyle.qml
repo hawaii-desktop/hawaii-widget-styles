@@ -32,20 +32,12 @@ import QtQuick.Controls.Private 1.0
 ToolBarStyle {
     id: toolBarStyle
 
-    /*! \internal */
-    property var __syspal: SystemPalette {
-        colorGroup: control.enabled ?
-                        SystemPalette.Active : SystemPalette.Disabled
-    }
+    property color baseColor: "#eeeeee"
 
     panel: Rectangle {
         gradient: Gradient {
-/*
-            GradientStop { position: 0; color: Qt.lighter(__syspal.window, 1.2) }
-            GradientStop { position: 1; color: Qt.darker(__syspal.window, 1.2) }
-*/
-            GradientStop { position: 0; color: "#eee" }
-            GradientStop { position: 1; color: "#aaa" }
+            GradientStop { position: 0; color: Qt.lighter(baseColor, 1.25); }
+            GradientStop { position: 1; color: Qt.lighter(baseColor, 0.75); }
         }
 
         Image {
@@ -58,7 +50,6 @@ ToolBarStyle {
                 anchors.bottom: parent.bottom
                 width: parent.width
                 height: 1
-                //color: Qt.darker(__syspal.window, 1.5)
                 color: "#999"
             }
         }
