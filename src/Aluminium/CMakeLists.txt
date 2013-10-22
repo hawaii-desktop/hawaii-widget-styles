@@ -13,6 +13,7 @@ set(FILES
     SliderStyle.qml
     SpinBoxStyle.qml
     StatusBarStyle.qml
+    SwitchStyle.qml
     TabViewStyle.qml
     TableViewStyle.qml
     TextFieldStyle.qml
