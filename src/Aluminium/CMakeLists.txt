@@ -1,4 +1,5 @@
 set(FILES
+    BusyIndicatorStyle.qml
     ButtonStyle.qml
     CheckBoxStyle.qml
     ComboBoxStyle.qml
