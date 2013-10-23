@@ -1,8 +1,10 @@
 module QtQuick.Controls.Styles.Aluminium
 
+BusyIndicatorStyle 1.0 BusyIndicatorStyle.qml
 ButtonStyle 1.0 ButtonStyle.qml
 CheckBoxStyle 1.0 CheckBoxStyle.qml
 RadioButtonStyle 1.0 RadioButtonStyle.qml
 ProgressBarStyle 1.0 ProgressBarStyle.qml
 SliderStyle 1.0 SliderStyle.qml
+SwitchStyle 1.0 SwitchStyle.qml
 TextFieldStyle 1.0 TextFieldStyle.qml

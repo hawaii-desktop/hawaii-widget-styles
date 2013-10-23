@@ -28,42 +28,72 @@ import QtQuick 2.1
 import QtQuick.Controls 1.0
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Controls.Private 1.0
-import QtGraphicalEffects 1.0
 
 ToolButtonStyle {
-    panel: Item {
+    property int radii: 5
+    property color fgColor: "#333333"
+    property color bgColor: "#eeeeee"
+    property color buttonColor: Qt.darker(bgColor, 1.02)
+
+    panel: Rectangle {
         implicitWidth: 36
         implicitHeight: 36
+        border.color: "#44000000"
+        radius: radii
+        antialiasing: true
+
+        readonly property bool hasIcon: icon.status === Image.Ready || icon.status === Image.Loading
 
         Rectangle {
-            id: mainItem
-            anchors.fill: parent
-            border.color: "#999"
-            radius: 6
-            antialiasing: true
-            visible: true
-
-            Rectangle {
-                anchors.fill: parent
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#f7f7f7" }
-                    GradientStop { position: 1.0; color: "#aaa" }
-                }
-                radius: 6
-                antialiasing: true
-                visible: !control.pressed
+            anchors {
+                fill: parent
+                margins: 1
             }
+            radius: radii - 1
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 1.02); }
+                GradientStop { position: 0.5; color: buttonColor; }
+                GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 0.95); }
+            }
+            opacity: control.pressed || (control.checkable && control.checked) ? 0.0 : 1.0
 
-            Rectangle {
-                anchors.fill: parent
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#dedede"; }
-                    GradientStop { position: 0.38; color: "#ededed"; }
-                    GradientStop { position: 1.0; color: "#ededed"; }
-                }
-                radius: 6
-                antialiasing: true
-                visible: control.pressed
+            Behavior on opacity {
+                NumberAnimation { duration: 80 }
+            }
+        }
+
+        Rectangle {
+            anchors {
+                fill: parent
+                margins: 1
+            }
+            radius: radii
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 0.85); }
+                GradientStop { position: 0.5; color: buttonColor; }
+                GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 0.98); }
+            }
+            opacity: control.pressed || (control.checkable && control.checked) ? 1.0 : 0.0
+
+            Behavior on opacity {
+                NumberAnimation { duration: 80 }
+            }
+        }
+
+        Item {
+            anchors {
+                left: parent.left
+                top: parent.top
+                right: arrow.left
+                bottom: parent.bottom
+            }
+            clip: true
+
+            Text {
+                id: label
+                anchors.centerIn: parent
+                text: control.text
+                visible: !hasIcon
             }
 
             Image {
@@ -77,33 +107,23 @@ ToolButtonStyle {
                     }
                     return control.iconSource;
                 }
-                sourceSize {
-                    width: 24
-                    height: 24
-                }
+                sourceSize.width: width
+                sourceSize.height: height
                 width: 24
                 height: 24
             }
-
-            Text {
-                id: label
-                anchors.centerIn: parent
-                text: control.text
-                visible: icon.status != Image.Ready
-            }
         }
 
-        DropShadow {
-            anchors.fill: mainItem
-            horizontalOffset: 0
-            verticalOffset: 1
-            radius: 4
-            samples: 16
-            spread: 0
-            color: "#40000000"
-            source: mainItem
-            transparentBorder: true
-            visible: false
+        Image {
+            id: arrow
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: visible ? 3 : 0
+            }
+            source: visible ? "images/arrow-down.png" : ""
+            opacity: control.enabled ? 0.7 : 0.5
+            visible: control.menu !== null
         }
     }
 }
