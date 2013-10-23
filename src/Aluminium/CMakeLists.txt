@@ -28,6 +28,9 @@ if("${Qt5_VERSION}" VERSION_EQUAL "5.2.0" OR "${Qt5_VERSION}" VERSION_GREATER "5
     install(FILES qmldir52
             DESTINATION ${QT_IMPORTS_DIR}/QtQuick/Controls/Styles/Aluminium
             RENAME qmldir)
+    install(FILES ScrollViewStyle52.qml
+            DESTINATION ${QT_IMPORTS_DIR}/QtQuick/Controls/Styles/Aluminium
+            RENAME ScrollViewStyle.qml)
 else()
     set(FILES
         ${FILES}
