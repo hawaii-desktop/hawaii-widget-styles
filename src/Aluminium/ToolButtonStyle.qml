@@ -28,8 +28,11 @@ import QtQuick 2.1
 import QtQuick.Controls 1.0
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Controls.Private 1.0
+import FluidUi 0.2 as FluidUi
 
 ToolButtonStyle {
+    id: toolButtonStyle
+
     property int radii: 5
     property color fgColor: "#333333"
     property color bgColor: "#eeeeee"
@@ -96,21 +99,21 @@ ToolButtonStyle {
                 visible: !hasIcon
             }
 
-            Image {
+            FluidUi.Icon {
                 id: icon
                 anchors.centerIn: parent
-                source: {
-                    if (control.__action) {
-                        if (control.__action.iconName)
-                            return "image://desktoptheme/" + control.__action.iconName;
+                iconName: control.__action.iconName ? control.__action.iconName : ""
+                iconSource: {
+                    if (control.__action && !control.__action.iconName)
                         return control.__action.iconSource;
-                    }
-                    return control.iconSource;
+                    if (control.iconSource)
+                        return control.iconSource;
+                    return "";
                 }
-                sourceSize.width: width
-                sourceSize.height: height
+
                 width: 24
                 height: 24
+                color: toolButtonStyle.fgColor
             }
         }
 
