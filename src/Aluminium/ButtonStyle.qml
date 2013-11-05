@@ -35,8 +35,7 @@ ButtonStyle {
     property int radii: 5
     property int margin: 10
     property color fgColor: "#333333"
-    property color bgColor: "#eeeeee"
-    property color buttonColor: Qt.lighter(bgColor, 1.02)
+    property color bgColor: "#ededed"
 
     padding {
         top: margin
@@ -52,7 +51,7 @@ ButtonStyle {
         text: control.text
         color: fgColor
         style: Text.Raised
-        styleColor: Qt.lighter(buttonColor, 1.25)
+        styleColor: Qt.lighter(bgColor, 1.25)
     }
 
     background: Item {
@@ -70,47 +69,22 @@ ButtonStyle {
             antialiasing: true
 
             Rectangle {
+                property bool pressed: control.pressed
+
                 id: mainItem
                 anchors {
                     fill: parent
                     margins: 2
                 }
-                border.color: "#40000000"
+                border.color: "#a7aba7"
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: pressed ? "#7d7d7d" : Qt.lighter(bgColor, 1.05); }
+                    GradientStop { position: 0.4; color: pressed ? "#9e9e9e" : bgColor; }
+                    GradientStop { position: 1.0; color: pressed ? "#999999" : Qt.darker(bgColor, 1.08); }
+                }
                 radius: radii
                 antialiasing: true
                 visible: false
-
-                Rectangle {
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
-                    radius: radii
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 0.95); }
-                        GradientStop { position: 0.5; color: buttonColor; }
-                        GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 1.08); }
-                    }
-                    opacity: control.pressed ? 1.0 : 0.0
-
-                    Behavior on opacity { NumberAnimation { easing.type: Easing.OutSine; duration: 75 } }
-                }
-
-                Rectangle {
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
-                    radius: radii
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 1.08); }
-                        GradientStop { position: 0.5; color: buttonColor; }
-                        GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 0.95); }
-                    }
-                    opacity: !control.pressed ? 1.0 : 0.0
-
-                    Behavior on opacity { NumberAnimation { easing.type: Easing.OutSine; duration: 75 } }
-                }
             }
 
             DropShadow {

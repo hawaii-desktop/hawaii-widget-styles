@@ -32,12 +32,13 @@ import QtQuick.Controls.Private 1.0
 ToolBarStyle {
     id: toolBarStyle
 
-    property color baseColor: "#eeeeee"
+    property color baseColor: "#ededed"
 
     panel: Rectangle {
         gradient: Gradient {
-            GradientStop { position: 0; color: Qt.lighter(baseColor, 1.25); }
-            GradientStop { position: 1; color: Qt.lighter(baseColor, 0.75); }
+            GradientStop { position: 0.0; color: Qt.lighter(baseColor, 1.25); }
+            GradientStop { position: 0.2; color: Qt.lighter(baseColor, 1.25); }
+            GradientStop { position: 1.0; color: Qt.darker(baseColor, 1.15); }
         }
 
         Image {

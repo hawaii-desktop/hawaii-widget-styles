@@ -35,53 +35,29 @@ ToolButtonStyle {
 
     property int radii: 5
     property color fgColor: "#333333"
-    property color bgColor: "#eeeeee"
-    property color buttonColor: Qt.darker(bgColor, 1.02)
+    property color bgColor: "#ededed"
+
+    padding {
+        left: 4
+        top: 4
+        right: 4
+        bottom: 4
+    }
 
     panel: Rectangle {
         implicitWidth: 36
         implicitHeight: 36
-        border.color: "#44000000"
+        border.color: "#a7aba7"
         radius: radii
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: pressed ? "#7d7d7d" : Qt.lighter(bgColor, 1.05); }
+            GradientStop { position: 0.4; color: pressed ? "#9e9e9e" : bgColor; }
+            GradientStop { position: 1.0; color: pressed ? "#999999" : Qt.darker(bgColor, 1.08); }
+        }
         antialiasing: true
 
         readonly property bool hasIcon: icon.status === Image.Ready || icon.status === Image.Loading
-
-        Rectangle {
-            anchors {
-                fill: parent
-                margins: 1
-            }
-            radius: radii - 1
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 1.02); }
-                GradientStop { position: 0.5; color: buttonColor; }
-                GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 0.95); }
-            }
-            opacity: control.pressed || (control.checkable && control.checked) ? 0.0 : 1.0
-
-            Behavior on opacity {
-                NumberAnimation { duration: 80 }
-            }
-        }
-
-        Rectangle {
-            anchors {
-                fill: parent
-                margins: 1
-            }
-            radius: radii
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 0.85); }
-                GradientStop { position: 0.5; color: buttonColor; }
-                GradientStop { position: 1.0; color: Qt.lighter(buttonColor, 0.98); }
-            }
-            opacity: control.pressed || (control.checkable && control.checked) ? 1.0 : 0.0
-
-            Behavior on opacity {
-                NumberAnimation { duration: 80 }
-            }
-        }
+        readonly property bool pressed: control.pressed || (control.checkable && control.checked)
 
         Item {
             anchors {
