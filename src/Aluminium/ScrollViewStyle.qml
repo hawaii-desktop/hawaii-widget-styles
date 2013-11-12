@@ -24,9 +24,11 @@
  * $END_LICENSE$
  ***************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick 2.2
+import QtQuick.Controls.Styles 1.1
 
 ScrollViewStyle {
+    // TODO: We should probably detect whether the main input device
+    // is mouse or touch and set this accordingly (true for touch otherwise false)
+    transientScrollBars: true
 }

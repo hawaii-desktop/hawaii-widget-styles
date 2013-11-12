@@ -5,7 +5,7 @@ Styles for applications using QtQuick Controls.
 
 ## Dependencies
 
-In order to build and install Widget Styles you need Qt 5.1 or better with
+In order to build and install Widget Styles you need Qt 5.2 or better with
 at least the following modules:
 
 * qtbase
