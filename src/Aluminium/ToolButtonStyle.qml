@@ -28,7 +28,7 @@ import QtQuick 2.1
 import QtQuick.Controls 1.0
 import QtQuick.Controls.Styles 1.0
 import QtQuick.Controls.Private 1.0
-import FluidUi 0.2 as FluidUi
+import Fluid.Ui 0.2 as FluidUi
 
 ToolButtonStyle {
     id: toolButtonStyle
