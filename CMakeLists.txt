@@ -17,6 +17,9 @@ set(WIDGET_STYLES_VERSION_STRING "${WIDGET_STYLES_VERSION_MAJOR}.${WIDGET_STYLES
 # Installation directories
 include(GNUInstallDirs)
 
+# Custom directories
+set(STYLES_INSTALLDIR "${CMAKE_INSTALL_LIBDIR}/hawaii/qml/QtQuick/Controls/Styles")
+
 # Macro to print feature summary
 include(FeatureSummary)
 
@@ -40,8 +43,6 @@ add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 
 # Find Qt5
 find_package(Qt5 5.2 REQUIRED COMPONENTS Quick)
-get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
-exec_program(${QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_QML" RETURN_VALUE return_code OUTPUT_VARIABLE QT_IMPORTS_DIR)
 
 # Subdirectories
 add_subdirectory(src)
