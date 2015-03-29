@@ -52,6 +52,7 @@ add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 find_package(Qt5 5.2 REQUIRED COMPONENTS Quick)
 
 # Subdirectories
+add_subdirectory(colorschemes)
 add_subdirectory(src)
 
 # Display featute summary
