@@ -1,6 +1,6 @@
 project(WidgetStyles)
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -14,21 +14,28 @@ set(WIDGET_STYLES_VERSION_MINOR 3)
 set(WIDGET_STYLES_VERSION_PATCH 0)
 set(WIDGET_STYLES_VERSION_STRING "${WIDGET_STYLES_VERSION_MAJOR}.${WIDGET_STYLES_VERSION_MINOR}.${WIDGET_STYLES_VERSION_PATCH}")
 
-# Installation directories
-include(GNUInstallDirs)
+# ECM
+find_package(ECM 0.0.11 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-# Custom directories
-set(STYLES_INSTALLDIR "${CMAKE_INSTALL_LIBDIR}/hawaii/qml/QtQuick/Controls/Styles")
+# Installation directories
+include(KDEInstallDirs)
+
+# Other macros
+include(KDECMakeSettings)
+include(KDECompilerSettings)
 
 # Macro to print feature summary
 include(FeatureSummary)
 
 # Add custom uninstall target
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+if ("${ECM_VERSION}" VERSION_LESS "1.7.0")
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+        IMMEDIATE @ONLY)
+    add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+endif()
 
 # Set up packaging
 set(CPACK_PACKAGE_NAME "hawaii-widget-styles")

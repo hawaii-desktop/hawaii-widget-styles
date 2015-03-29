@@ -23,7 +23,7 @@ set(FILES
 )
 
 install(FILES ${FILES}
-        DESTINATION ${STYLES_INSTALLDIR}/Aluminium)
+        DESTINATION ${QML_INSTALL_DIR}/QtQuick/Controls/Styles/Aluminium)
 
 set(IMAGES
     images/progress-indeterminate.png
@@ -31,4 +31,4 @@ set(IMAGES
 )
 
 install(FILES ${IMAGES}
-        DESTINATION ${STYLES_INSTALLDIR}/Aluminium/images)
+        DESTINATION ${QML_INSTALL_DIR}/QtQuick/Controls/Styles/Aluminium/images)
