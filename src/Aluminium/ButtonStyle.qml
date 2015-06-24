@@ -25,17 +25,15 @@
  ***************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
-import QtGraphicalEffects 1.0
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.1 as QtQuickControlsStyles
+import Hawaii.Themes 1.0 as Themes
+import "ColorUtils.js" as ColorUtils
 
-ButtonStyle {
+QtQuickControlsStyles.ButtonStyle {
     id: buttonStyle
 
-    property int radii: 5
-    property int margin: 10
-    property color fgColor: "#333333"
-    property color bgColor: "#ededed"
+    property int margin: Themes.Units.smallSpacing
 
     padding {
         top: margin
@@ -44,60 +42,55 @@ ButtonStyle {
         bottom: margin
     }
 
+    SystemPalette {
+        id: syspal
+        colorGroup: control.enabled ? SystemPalette.Active : SystemPalette.Disabled
+    }
+
     label: Text {
         renderType: Text.NativeRendering
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         text: control.text
-        color: fgColor
-        style: Text.Raised
-        styleColor: Qt.lighter(bgColor, 1.25)
+        color: syspal.buttonText
     }
-
     background: Item {
-        implicitWidth: 100
-        implicitHeight: 30
+        implicitWidth: Themes.Units.dp(96)
+        implicitHeight: Themes.Units.dp(32)
 
         Rectangle {
             anchors.fill: parent
             color: "transparent"
             border {
-                width: 4
-                color: control.activeFocus ? "#401094ff" : "transparent"
+                width: Themes.Units.dp(4)
+                color: control.activeFocus ? ColorUtils.adjustAlpha(syspal.highlight, 0.5) : "transparent"
             }
-            radius: radii
+            radius: Themes.Units.dp(4)
             antialiasing: true
 
             Rectangle {
-                property bool pressed: control.pressed
-
                 id: mainItem
                 anchors {
                     fill: parent
-                    margins: 2
+                    margins: Themes.Units.dp(2)
                 }
-                border.color: "#a7aba7"
+                border.color: syspal.shadow
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: pressed ? "#7d7d7d" : Qt.lighter(bgColor, 1.05); }
-                    GradientStop { position: 0.4; color: pressed ? "#9e9e9e" : bgColor; }
-                    GradientStop { position: 1.0; color: pressed ? "#999999" : Qt.darker(bgColor, 1.08); }
+                    GradientStop {
+                        position: 0.0
+                        color: control.pressed ? syspal.mid : Qt.lighter(syspal.button, 1.05)
+                    }
+                    GradientStop {
+                        position: 0.4
+                        color: control.pressed ? syspal.shadow : syspal.button
+                    }
+                    GradientStop {
+                        position: 1.0
+                        color: control.pressed ? syspal.dark : Qt.darker(syspal.button, 1.08)
+                    }
                 }
-                radius: radii
+                radius: Themes.Units.dp(4)
                 antialiasing: true
-                visible: false
-            }
-
-            DropShadow {
-                anchors.fill: mainItem
-                horizontalOffset: 1
-                verticalOffset: 1
-                radius: 8
-                samples: 16
-                spread: 0
-                fast: true
-                transparentBorder: true
-                color: "#40000000"
-                source: mainItem
             }
         }
     }
