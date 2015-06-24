@@ -1,7 +1,7 @@
 /****************************************************************************
  * This file is part of Hawaii Widget Styles.
  *
- * Copyright (C) 2013-2014 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2013-2015 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  *
  * Author(s):
  *    Pier Luigi Fiorini
@@ -25,8 +25,25 @@
  ***************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Controls.Styles 1.0 as QtQuickControlsStyles
+import Hawaii.Themes 1.0 as Themes
 
-StatusBarStyle {
+QtQuickControlsStyles.StatusBarStyle {
+    padding {
+        left: Themes.Units.dp(4)
+        top: Themes.Units.dp(4)
+        right: Themes.Units.dp(4)
+        bottom: Themes.Units.dp(4)
+    }
+
+    SystemPalette {
+        id: syspal
+        colorGroup: SystemPalette.Active
+    }
+
+    background: Rectangle {
+        implicitWidth: Themes.Units.dp(200)
+        implicitHeight: Themes.Units.dp(16)
+        color: syspal.window
+    }
 }

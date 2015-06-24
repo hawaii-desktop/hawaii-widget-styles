@@ -1,7 +1,7 @@
 /****************************************************************************
  * This file is part of Hawaii Widget Styles.
  *
- * Copyright (C) 2013-2014 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2013-2015 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  *
  * Author(s):
  *    Pier Luigi Fiorini
@@ -25,39 +25,37 @@
  ***************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
-import QtQuick.Controls.Private 1.0
-import Fluid.Ui 1.0 as FluidUi
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Private 1.0 as QtQuickControlsPrivate
+import Hawaii.Components 1.0 as Components
+import Hawaii.Themes 1.0 as Themes
+import "Constants.js" as Constants
 
-ToolButtonStyle {
-    id: toolButtonStyle
+QtQuickControlsPrivate.Style {
+    readonly property ToolButton control: __control
 
-    property int radii: 5
-    property color fgColor: "#333333"
-    property color bgColor: "#ededed"
-
-    padding {
-        left: 4
-        top: 4
-        right: 4
-        bottom: 4
+    SystemPalette {
+        id: syspal
+        colorGroup: control.enabled ? SystemPalette.Active : SystemPalette.Disabled
     }
 
-    panel: Rectangle {
-        implicitWidth: 36
-        implicitHeight: 36
-        border.color: "#a7aba7"
-        radius: radii
+    property Component panel: Rectangle {
+        readonly property bool hasIcon: icon.status === Image.Ready || icon.status === Image.Loading
+        readonly property bool hasText: control.text != ""
+        readonly property bool pressed: control.pressed || (control.checkable && control.checked)
+        readonly property real minSize: Themes.Units.iconSizes.smallMedium + (Themes.Units.smallSpacing * 2)
+
+        implicitWidth: Math.max(row.width + row.spacing * 2, minSize) + (arrow.visible ? Themes.Units.dp(10) : 0)
+        implicitHeight: Math.max(Math.max(hasIcon ? icon.height : label.implicitHeight), minSize)
+        border.color: syspal.mid
+        radius: Constants.roundedRectRadius
         gradient: Gradient {
-            GradientStop { position: 0.0; color: pressed ? "#7d7d7d" : Qt.lighter(bgColor, 1.05); }
-            GradientStop { position: 0.4; color: pressed ? "#9e9e9e" : bgColor; }
-            GradientStop { position: 1.0; color: pressed ? "#999999" : Qt.darker(bgColor, 1.08); }
+            GradientStop { position: 0.0; color: pressed ? syspal.mid : Qt.lighter(syspal.button, 1.05); }
+            GradientStop { position: 0.4; color: pressed ? syspal.midlight : syspal.button; }
+            GradientStop { position: 1.0; color: pressed ? syspal.light : Qt.darker(syspal.button, 1.08); }
         }
         antialiasing: true
-
-        readonly property bool hasIcon: icon.status === Image.Ready || icon.status === Image.Loading
-        readonly property bool pressed: control.pressed || (control.checkable && control.checked)
+        opacity: control.enabled ? 1.0 : 0.5
 
         Item {
             anchors {
@@ -68,28 +66,33 @@ ToolButtonStyle {
             }
             clip: true
 
-            Text {
-                id: label
+            Row {
+                id: row
                 anchors.centerIn: parent
-                text: control.text
-                visible: !hasIcon
-            }
+                spacing: Themes.Units.smallSpacing
 
-            FluidUi.Icon {
-                id: icon
-                anchors.centerIn: parent
-                iconName: control.__action.iconName ? control.__action.iconName : ""
-                iconSource: {
-                    if (control.__action && !control.__action.iconName)
-                        return control.__action.iconSource;
-                    if (control.iconSource)
-                        return control.iconSource;
-                    return "";
+                Components.Icon {
+                    id: icon
+                    iconName: control.__action.iconName ? control.__action.iconName : ""
+                    iconSource: {
+                        if (control.__action && !control.__action.iconName)
+                            return control.__action.iconSource;
+                        if (control.iconSource)
+                            return control.iconSource;
+                        return "";
+                    }
+                    width: Themes.Units.iconSizes.smallMedium
+                    height: width
+                    color: syspal.text
                 }
 
-                width: 24
-                height: 24
-                color: toolButtonStyle.fgColor
+                Text {
+                    id: label
+                    anchors.verticalCenter: icon.verticalCenter
+                    text: QtQuickControlsPrivate.StyleHelpers.stylizeMnemonics(control.text)
+                    renderType: Text.NativeRendering
+                    visible: hasText
+                }
             }
         }
 

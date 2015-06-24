@@ -26,9 +26,10 @@
 
 import QtQuick 2.1
 import QtQuick.Controls.Styles 1.1
+import Hawaii.Themes 1.0 as Themes
+import "Constants.js" as Constants
 
 SwitchStyle {
-    property int radii: 5
     property int margin: 2
     property color bgColor: "#eeeeee"
     property color buttonColor: Qt.lighter(bgColor, 1.02)
@@ -44,7 +45,7 @@ SwitchStyle {
         implicitWidth: 30
         implicitHeight: 24
         border.color: "#44000000"
-        radius: radii - 1
+        radius: Constants.roundedRectRadius - 1
         antialiasing: true
 
         Rectangle {
@@ -52,7 +53,7 @@ SwitchStyle {
                 fill: parent
                 margins: 1
             }
-            radius: radii - 1
+            radius: Constants.roundedRectRadius - 1
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Qt.lighter(buttonColor, 1.08); }
                 GradientStop { position: 0.5; color: buttonColor; }
@@ -76,7 +77,7 @@ SwitchStyle {
 
         implicitWidth: 64
         implicitHeight: 24
-        radius: radii
+        radius: Constants.roundedRectRadius
         antialiasing: true
         gradient: Gradient {
             GradientStop { position: 0.0; color: shadow }
@@ -111,8 +112,6 @@ SwitchStyle {
             horizontalAlignment: Text.AlignHCenter
             text: control.checked ? "ON" : "OFF"
             color: fg
-            style: Text.Raised
-            styleColor: control.checked ? Qt.darker(buttonColor, 1.25) : Qt.lighter(buttonColor, 1.25)
             states: [
                 State {
                     name: "on"

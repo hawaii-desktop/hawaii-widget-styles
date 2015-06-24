@@ -1,7 +1,7 @@
 /****************************************************************************
  * This file is part of Hawaii Widget Styles.
  *
- * Copyright (C) 2013-2014 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2015 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  *
  * Author(s):
  *    Pier Luigi Fiorini
@@ -24,20 +24,20 @@
  * $END_LICENSE$
  ***************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls.Styles 1.0 as QtQuickControlsStyles
+import QtQuick 2.0
+import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.1
 
-QtQuickControlsStyles.CheckBoxStyle {
-    SystemPalette {
-        id: syspal
-        colorGroup: control.enabled ? SystemPalette.Active : SystemPalette.Disabled
-    }
+GridLayout {
+    SystemPalette { id: sysPalette; colorGroup: SystemPalette.Active }
 
-    label: Text {
-        renderType: Text.NativeRendering
-        verticalAlignment: Text.AlignVCenter
-        text: control.text
-        color: syspal.text
+    anchors.fill: parent
+    anchors.margins: 16
+    Layout.minimumWidth: 400
+    Layout.minimumHeight: 300
+    columns: 1
+    rows: 1
+
+    Calendar {
     }
-    indicator: CheckBoxIndicator {}
 }

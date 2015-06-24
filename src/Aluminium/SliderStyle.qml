@@ -1,7 +1,7 @@
 /****************************************************************************
  * This file is part of Hawaii Widget Styles.
  *
- * Copyright (C) 2013-2014 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ * Copyright (C) 2013-2015 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
  *
  * Author(s):
  *    Pier Luigi Fiorini
@@ -26,55 +26,58 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
+import QtQuick.Controls.Styles 1.0 as QtQuickControlsStyles
 import QtGraphicalEffects 1.0
+import Hawaii.Themes 1.0 as Themes
+import "Constants.js" as Constants
+import "ColorUtils.js" as ColorUtils
 
-SliderStyle {
-    id: slideStyle
+QtQuickControlsStyles.SliderStyle {
+    SystemPalette {
+        id: syspal
+        colorGroup: control.enabled ? SystemPalette.Active : SystemPalette.Disabled
+    }
 
     handle: Item {
-        implicitWidth: 18
-        implicitHeight: 18
+        implicitWidth: Constants.indicatorSize
+        implicitHeight: implicitWidth
 
         Rectangle {
             id: knobItem
             anchors.fill: parent
-            border.color: Qt.darker("#468bb7", 3.0)
+            border.color: ColorUtils.blendColors(syspal.window, syspal.dark)
             radius: height
             antialiasing: true
             visible: false
         }
 
         RadialGradient {
-            anchors.fill: parent
+            anchors.fill: knobItem
             source: knobItem
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.lighter("#468bb7", 1.2); }
-                GradientStop { position: 1.0; color: Qt.darker("#468bb7", 2.2); }
+                GradientStop { position: 0.0; color: syspal.highlight }
+                GradientStop { position: 1.0; color: Qt.darker(syspal.highlight, 1.5) }
             }
             horizontalOffset: -2
             verticalOffset: 2
         }
     }
-
     groove: Item {
         property color baseColor: "#f1f1f1"
-        property color highlightColor: "#468bb7"
 
-        implicitWidth: 100
-        implicitHeight: 10
+        implicitWidth: Themes.Units.dp(300)
+        implicitHeight: Themes.Units.dp(10)
 
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width
-            height: 8
-            border.color: Qt.darker(baseColor, 3.0)
+            height: Themes.Units.dp(8)
+            border.color: ColorUtils.blendColors(syspal.window, syspal.dark)
             radius: height / 2
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.darker(baseColor, 2.0); }
-                GradientStop { position: 0.38; color: Qt.darker(baseColor, 1.5); }
-                GradientStop { position: 0.99; color: Qt.darker(baseColor, 1.2); }
-                GradientStop { position: 1.0; color: Qt.darker(baseColor, 1.1); }
+                GradientStop { position: 0.0; color: syspal.mid }
+                GradientStop { position: 0.5; color: syspal.shadow }
+                GradientStop { position: 1.0; color: syspal.dark }
             }
             antialiasing: true
             opacity: 0.8
@@ -82,13 +85,12 @@ SliderStyle {
             Rectangle {
                 width: parent.width * control.value / control.maximumValue
                 height: parent.height
-                border.color: Qt.darker(highlightColor, 3.0)
+                border.color: ColorUtils.blendColors(Qt.darker(syspal.highlight, 1.3), syspal.dark)
                 radius: height / 2
                 gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#2a536e"; }
-                    GradientStop { position: 0.38; color: "#3d7aa0"; }
-                    GradientStop { position: 0.99; color: "#468bb7"; }
-                    GradientStop { position: 1.0; color: "#4991bf"; }
+                    GradientStop { position: 0.0; color: Qt.darker(syspal.highlight, 1.5) }
+                    GradientStop { position: 0.5; color: Qt.darker(syspal.highlight, 1.2) }
+                    GradientStop { position: 1.0; color: syspal.highlight }
                 }
                 antialiasing: true
             }
