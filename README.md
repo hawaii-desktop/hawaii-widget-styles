@@ -1,6 +1,10 @@
 Widget Styles
 =============
 
+[![IRC Network](https://img.shields.io/badge/irc-freenode-blue.svg "IRC Freenode")](https://webchat.freenode.net/?channels=hawaii-desktop)
+[![GitHub release](https://img.shields.io/github/release/hawaii-desktop/hawaii-widget-styles.svg)](https://github.com/hawaii-desktop/hawaii-widget-styles)
+[![GitHub issues](https://img.shields.io/github/issues/hawaii-desktop/hawaii-widget-styles.svg)](https://github.com/hawaii-desktop/hawaii-widget-styles/issues)
+
 Styles for applications using QtQuick Controls.
 
 ## Dependencies
