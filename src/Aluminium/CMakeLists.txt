@@ -19,6 +19,8 @@ set(FILES
     TextFieldStyle.qml
     ToolBarStyle.qml
     ToolButtonStyle.qml
+    ColorUtils.js
+    Constants.js
     qmldir
 )
 
